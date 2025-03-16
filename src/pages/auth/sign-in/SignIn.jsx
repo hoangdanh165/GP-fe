@@ -11,12 +11,24 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../../../themes/shared-theme/AppTheme';
 import ColorModeSelect from '../../../themes/shared-theme/ColorModeSelect';
 import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
+import { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from '../../../services/axios';
+import useAuth from '../../../hooks/useAuth';
+import GoogleSignInButton from '../../../components/GoogleSignInButton';
+import SnackbarNotification from '../../../components/SnackbarNotification';
+
+
+const SIGN_IN_API = import.meta.env.VITE_SIGN_IN_API;
+const SIGN_UP_URL = import.meta.env.VITE_SIGN_UP_URL;
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -36,6 +48,10 @@ const Card = styled(MuiCard)(({ theme }) => ({
       'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
   }),
 }));
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
   height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
@@ -60,12 +76,22 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function SignIn(props: { disableCustomTheme?: boolean }) {
+const SignIn = (props) => {
+  const navigate = useNavigate();
+  const { setAuth, persist, setPersist } = useAuth();
+
+  const [errMsg, setErrMsg] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -75,21 +101,55 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     setOpen(false);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!validateInputs()) {
       return;
     }
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    let email, password;
+    email = data.get('email');
+    password = data.get('password');
+
+    try {
+      const response = await axios.post(SIGN_IN_API,
+          JSON.stringify({ email, password }),
+          {
+              headers: { 'Content-Type': 'application/json' },
+          }
+      );
+
+      localStorage.setItem('isLoggedIn', 'true');
+      const accessToken = response?.data?.accessToken;
+      const role = response?.data?.role;
+      const status = response?.data?.status;
+      const avatar = response?.data?.avatar;
+      const fullName = response?.data?.fullName;
+
+      setAuth({ email, role, status, accessToken, avatar, fullName });
+      
+      navigate("/auth/sign-up");
+      
+    } catch (err) {
+      console.log(err);
+      if (!err?.response) {
+        setErrMsg("No responses from server!");
+      } else if (err.response?.status === 401) {
+        setErrMsg(err.response.data.error);
+        console.log("401 Error: ", err.response);
+      } else if (err.response?.status === 400) {
+        setErrMsg(err.response.data.error);
+        console.log("401 Error: ", err.response);
+      } else {
+        setErrMsg("Sign in failed!");
+      }
+      setSnackbarOpen(true);
+    }
   };
 
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
 
     let isValid = true;
 
@@ -102,9 +162,9 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
       setEmailErrorMessage('');
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password.value || password.value.length < 8) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Password must be at least 8 characters long.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -113,6 +173,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
 
     return isValid;
   };
+
+  useEffect(() => {
+    localStorage.setItem("persist", persist);
+  }, [persist]);
 
   return (
     <AppTheme {...props}>
@@ -147,7 +211,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 id="email"
                 type="email"
                 name="email"
-                placeholder="your@email.com"
                 autoComplete="email"
                 autoFocus
                 required
@@ -162,7 +225,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 error={passwordError}
                 helperText={passwordErrorMessage}
                 name="password"
-                placeholder="••••••"
                 type="password"
                 id="password"
                 autoComplete="current-password"
@@ -173,10 +235,6 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
             <ForgotPassword open={open} handleClose={handleClose} />
             <Button
               type="submit"
@@ -198,26 +256,11 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
           </Box>
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign in with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign in with Google
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign in with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign in with Facebook
-            </Button>
+            <GoogleSignInButton />
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                href={SIGN_UP_URL}
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >
@@ -226,7 +269,15 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             </Typography>
           </Box>
         </Card>
+        <SnackbarNotification 
+          open={snackbarOpen} 
+          message={errMsg} 
+          severity="error" 
+          onClose={handleSnackbarClose} 
+        />
       </SignInContainer>
     </AppTheme>
   );
 }
+
+export default SignIn;

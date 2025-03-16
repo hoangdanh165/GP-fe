@@ -17,16 +17,16 @@ const NotFound = (): ReactElement => {
       py={12}
     >
       <Typography variant="h1" color="text.secondary">
-        Oops! Trang này không tồn tại!
+        Oops! Not found!
       </Typography>
       <Typography
         variant="h5"
-        fontWeight={400}
+        fontWeight={100}
         color="text.primary"
         maxWidth={600}
         textAlign="center"
       >
-        Chúng tôi không tìm thấy trang hiện tại bạn đang truy cập, vui lòng kiểm tra lại đường dẫn!
+        The page you visit not found, please check the url!
       </Typography>
       <Image
         alt="Not Found Image"
@@ -39,7 +39,7 @@ const NotFound = (): ReactElement => {
         }}
       />
       <Button href={ paths.login } size="large" variant="contained" component={Link}>
-        Quay lại
+        Go back
       </Button>
     </Stack>
   );

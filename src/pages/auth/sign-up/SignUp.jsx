@@ -207,14 +207,6 @@ export default function SignUp(props) {
             >
               Sign up with Google
             </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign up with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign up with Facebook
-            </Button>
             <Typography sx={{ textAlign: 'center' }}>
               Already have an account?{' '}
               <Link

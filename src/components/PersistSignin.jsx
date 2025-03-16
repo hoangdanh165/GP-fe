@@ -21,7 +21,7 @@ const PersistLogin = ({ children }) => {
                 const alertShown = Cookies.get("alertShown");
                 console.log(alertShown);
                 if (!alertShown) {
-                    alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!");
+                    alert("Your session has expired. Please log in again.!");
                     Cookies.set("alertShown", "true", { path: "/", expires: 1 });
                 }
             }

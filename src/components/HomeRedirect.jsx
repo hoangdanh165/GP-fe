@@ -13,17 +13,15 @@ const HomeRedirect = () => {
   }, [auth]);
 
   if (auth) {
-    if (auth.role === "admin") {
+    if (auth.role === "customer") {
       return <Navigate to={paths.accounts} />;
-    } else if (auth.role === "coach") {
+    } else if (auth.role === "admin") {
       return <Navigate to={paths.customer} />;
     } else if (auth.role === "sale") {
       return <Navigate to={paths.sale_contracts} />;
-    } else if (auth.role === "customer") {
-      return <Navigate to={paths.not_for_customer} />;
     } 
   }
-  return <Navigate to="/auth/login" replace/>;
+  return <Navigate to="/auth/sign-in" replace/>;
 };
 
 export default HomeRedirect;

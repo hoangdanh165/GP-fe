@@ -1,8 +1,13 @@
-import { ReactElement } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from "react-router-dom";
+import DynamicTitle from "./components/DynamicTitle";
 
 const App = () => {
-  return <Outlet />;
+  return (
+    <>
+      <DynamicTitle />
+      <Outlet />
+    </>
+  );
 };
 
 export default App;
