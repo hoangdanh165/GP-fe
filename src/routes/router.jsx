@@ -26,12 +26,12 @@ const Forbidden = lazy(() => import("../pages/error/Forbidden"));
 
 
 // Other components
-import PrivateRoute from "../components/PrivateRoute";
-import HomeRedirect from "../components/HomeRedirect";
-import IsLoggedIn from "../components/IsSignedIn";
+import PrivateRoute from "../components/utils/PrivateRoute";
+import HomeRedirect from "../components/utils/HomeRedirect";
+import IsLoggedIn from "../components/utils/IsSignedIn";
 import PageLoader from "../components/loading/PageLoader";
 import Splash from "../components/loading/Splash";
-const PersistSignin = lazy(() => import("../components/PersistSignin"));
+const PersistSignin = lazy(() => import("../components/utils/PersistSignin"));
 
 
 

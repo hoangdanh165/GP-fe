@@ -11,20 +11,18 @@ import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import ForgotPassword from './components/ForgotPassword';
 import AppTheme from '../../../themes/shared-theme/AppTheme';
 import ColorModeSelect from '../../../themes/shared-theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
+import { SitemarkIcon } from './components/CustomIcons';
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from '../../../services/axios';
 import useAuth from '../../../hooks/useAuth';
-import GoogleSignInButton from '../../../components/GoogleSignInButton';
-import SnackbarNotification from '../../../components/SnackbarNotification';
+import GoogleButton from '../../../components/auth/GoogleButton';
+import SnackbarNotification from '../../../components/utils/SnackbarNotification';
 
 
 const SIGN_IN_API = import.meta.env.VITE_SIGN_IN_API;
@@ -39,7 +37,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   gap: theme.spacing(2),
   margin: 'auto',
   [theme.breakpoints.up('sm')]: {
-    maxWidth: '450px',
+    maxWidth: '550px',
   },
   boxShadow:
     'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
@@ -49,9 +47,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
   height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
@@ -83,14 +78,15 @@ const SignIn = (props) => {
   const [errMsg, setErrMsg] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [open, setOpen] = useState(false);
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
+    setErrMsg('');
   };
 
   const handleClickOpen = () => {
@@ -139,7 +135,7 @@ const SignIn = (props) => {
         console.log("401 Error: ", err.response);
       } else if (err.response?.status === 400) {
         setErrMsg(err.response.data.error);
-        console.log("401 Error: ", err.response);
+        console.log("400 Error: ", err.response);
       } else {
         setErrMsg("Sign in failed!");
       }
@@ -256,7 +252,7 @@ const SignIn = (props) => {
           </Box>
           <Divider>or</Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <GoogleSignInButton />
+            <GoogleButton setErrMsg={setErrMsg} setSnackbarOpen={setSnackbarOpen} />
             <Typography sx={{ textAlign: 'center' }}>
               Don&apos;t have an account?{' '}
               <Link

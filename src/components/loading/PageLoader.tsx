@@ -1,11 +1,18 @@
 import { ReactElement } from 'react';
-import { Box, Stack, useTheme, StackOwnProps, CircularProgress } from '@mui/material';
+import { Box, Stack, useTheme, CircularProgress } from '@mui/material';
+import React from 'react';
 
-const PageLoader = (props: StackOwnProps): ReactElement => {
+const PageLoader = (): ReactElement => {
   const theme = useTheme();
   return (
-    <Stack width={1} height={1} justifyContent="center" alignItems="center" {...props}>
-      <Box height="10vh" width="25vw" textAlign="center">
+    <Stack
+      width="100vw"
+      height="100vh"
+      justifyContent="center"
+      alignItems="center"
+      sx={{ position: "fixed", top: 0, left: 0, zIndex: 9999}}
+    >
+      <Box textAlign="center">
         <svg width={0} height={0}>
           <defs>
             <linearGradient id="page_loader_gradient" x1="0%" y1="0%" x2="0%" y2="100%">

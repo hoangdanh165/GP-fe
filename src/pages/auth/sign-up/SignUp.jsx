@@ -15,7 +15,16 @@ import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../../../themes/shared-theme/AppTheme';
 import ColorModeSelect from '../../../themes/shared-theme/ColorModeSelect';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './components/CustomIcons';
+import GoogleButton from '../../../components/auth/GoogleButton';
+import { SitemarkIcon } from './components/CustomIcons';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import axios from '../../../services/axios';
+import SnackbarNotification from '../../../components/utils/SnackbarNotification';
+
+
+const SIGN_IN_URL = import.meta.env.VITE_SIGN_IN_URL;
+const SIGN_UP_API = import.meta.env.VITE_SIGN_UP_API;
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -28,7 +37,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   boxShadow:
     'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
   [theme.breakpoints.up('sm')]: {
-    width: '450px',
+    width: '550px',
   },
   ...theme.applyStyles('dark', {
     boxShadow:
@@ -59,18 +68,35 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   },
 }));
 
-export default function SignUp(props) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
+const SignUp = (props) => {
+  const navigate = useNavigate();
+
+  const [errMsg, setErrMsg] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [nameError, setNameError] = useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = useState('');
+  const [phoneError, setPhoneError] = useState(false);
+  const [phoneErrorMessage, setPhoneErrorMessage] = useState('');
+  const [addressError, setAddressError] = useState(false);
+  const [addressErrorMessage, setAddressErrorMessage] = useState('');
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+    setErrMsg('');
+  };
 
   const validateInputs = () => {
     const email = document.getElementById('email');
     const password = document.getElementById('password');
     const name = document.getElementById('name');
+    const phone = document.getElementById('phone');
+    const address = document.getElementById('address');
 
     let isValid = true;
 
@@ -101,12 +127,30 @@ export default function SignUp(props) {
       setNameErrorMessage('');
     }
 
+    if (!phone.value || phone.value.length < 1) {
+      setPhoneError(true);
+      setPhoneErrorMessage('Phone is required.');
+      isValid = false;
+    } else {
+      setPhoneError(false);
+      setPhoneErrorMessage('');
+    }
+    
+    if (!address.value || address.value.length < 1) {
+      setAddressError(true);
+      setAddressError('Address is required.');
+      isValid = false;
+    } else {
+      setAddressError(false);
+      setAddressErrorMessage('');
+    }
+
     return isValid;
   };
 
-  const handleSubmit = (event) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (!validateInputs()) {
       return;
     }
     const data = new FormData(event.currentTarget);
@@ -116,6 +160,38 @@ export default function SignUp(props) {
       email: data.get('email'),
       password: data.get('password'),
     });
+
+    const originalPhone = data.get('phone').trim();
+    const phone = originalPhone.startsWith('0') ? '+84' + originalPhone.slice(1) : originalPhone;
+    
+    try {
+      const response = await axios.post(SIGN_UP_API,
+        JSON.stringify({ 
+          full_name: data.get('name').trim(), 
+          phone, 
+          address: data.get('address').trim(), 
+          email: data.get('email').trim(), 
+          password: data.get('password') }),
+        {
+            headers: { 'Content-Type': 'application/json' },
+        }
+      );
+
+      alert(response.data.detail);
+      navigate(SIGN_IN_URL);
+
+    } catch (err) {
+      console.log(err?.response)
+        if (!err?.response) {
+            setErrMsg('No responses from server!');
+        } else if (err.response?.status === 400) {
+            setErrMsg('User with this email already exists!');
+        } else {
+            setErrMsg('Sign up failed!');
+        }
+        setSnackbarOpen(true);
+      }
+    
   };
 
   return (
@@ -137,27 +213,54 @@ export default function SignUp(props) {
             onSubmit={handleSubmit}
             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
+            <Stack direction="row" spacing={2}>
+              <FormControl sx={{ flex: 6 }}>
+                <FormLabel htmlFor="name">Full name</FormLabel>
+                <TextField
+                  autoComplete="name"
+                  name="name"
+                  required
+                  fullWidth
+                  id="name"
+                  error={nameError}
+                  helperText={nameErrorMessage}
+                  color={nameError ? 'error' : 'primary'}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel htmlFor="phone">Phone</FormLabel>
+                <TextField
+                  autoComplete="phone"
+                  name="phone"
+                  required
+                  fullWidth
+                  id="phone"
+                  error={phoneError}
+                  helperText={phoneErrorMessage}
+                  color={phoneError ? 'error' : 'primary'}
+                />
+              </FormControl>
+            </Stack>
             <FormControl>
-              <FormLabel htmlFor="name">Full name</FormLabel>
+              <FormLabel htmlFor="address">Address</FormLabel>
               <TextField
-                autoComplete="name"
-                name="name"
+                autoComplete="address"
+                name="address"
                 required
                 fullWidth
-                id="name"
-                placeholder="Jon Snow"
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? 'error' : 'primary'}
+                id="address"
+                error={addressError}
+                helperText={addressErrorMessage}
+                color={addressError ? 'error' : 'primary'}
               />
             </FormControl>
-            <FormControl>
+            <Stack direction="row" spacing={2}>
+            <FormControl sx={{ flex: 6 }}>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
                 required
                 fullWidth
                 id="email"
-                placeholder="your@email.com"
                 name="email"
                 autoComplete="email"
                 variant="outlined"
@@ -172,7 +275,6 @@ export default function SignUp(props) {
                 required
                 fullWidth
                 name="password"
-                placeholder="••••••"
                 type="password"
                 id="password"
                 autoComplete="new-password"
@@ -182,10 +284,7 @@ export default function SignUp(props) {
                 color={passwordError ? 'error' : 'primary'}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive updates via email."
-            />
+            </Stack>
             <Button
               type="submit"
               fullWidth
@@ -199,18 +298,11 @@ export default function SignUp(props) {
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
           </Divider>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => alert('Sign up with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign up with Google
-            </Button>
+            <GoogleButton buttonText="Sign up with Google" setErrMsg={setErrMsg} setSnackbarOpen={setSnackbarOpen} />
             <Typography sx={{ textAlign: 'center' }}>
               Already have an account?{' '}
               <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                href={SIGN_IN_URL}
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >
@@ -219,7 +311,16 @@ export default function SignUp(props) {
             </Typography>
           </Box>
         </Card>
+        <SnackbarNotification 
+          open={snackbarOpen} 
+          message={errMsg} 
+          severity="error" 
+          onClose={handleSnackbarClose} 
+        />
       </SignUpContainer>
     </AppTheme>
   );
 }
+
+
+export default SignUp;

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import DynamicTitle from "./components/DynamicTitle";
+import DynamicTitle from "./components/utils/DynamicTitle";
 
 const App = () => {
   return (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
   Box,
   Typography,
@@ -17,7 +17,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
-import NotificationService from "../services/notification";
+import NotificationService from "../../services/notification";
 
 const Notification = () => {
   const [notifications, setNotifications] = useState([]);

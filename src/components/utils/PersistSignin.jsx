@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import useRefreshToken from '../hooks/useRefreshToken';
-import useAuth from "../hooks/useAuth";
+import useRefreshToken from '../../hooks/useRefreshToken';
+import useAuth from "../../hooks/useAuth";
 import { CircularProgress } from "@mui/material";
 import Cookies from "js-cookie";
 
@@ -21,7 +21,7 @@ const PersistLogin = ({ children }) => {
                 const alertShown = Cookies.get("alertShown");
                 console.log(alertShown);
                 if (!alertShown) {
-                    alert("Your session has expired. Please log in again.!");
+                    alert("Your session has expired. Please log in again!");
                     Cookies.set("alertShown", "true", { path: "/", expires: 1 });
                 }
             }

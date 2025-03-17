@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import paths from "../routes/paths";
+import useAuth from "../../hooks/useAuth";
+import paths from "../../routes/paths";
 
 const HomeRedirect = () => {
   const { auth } = useAuth();
