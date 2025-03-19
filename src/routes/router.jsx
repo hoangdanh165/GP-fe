@@ -21,7 +21,7 @@ const Forbidden = lazy(() => import("../pages/error/Forbidden"));
 
 // Admin pages
 const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
-import Chat from "../pages/Chat";
+import Chat from "../pages/chat/Chat";
 
 //Sale pages
 
