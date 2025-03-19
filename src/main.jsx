@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import { CssBaseline, Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material';
-
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './themes/theme';
 import router from './routes/router';
 import './index.css';
 import { AuthProvider } from './contexts/AuthProvider';
@@ -13,11 +14,16 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <GoogleOAuthProvider clientId={CLIENT_ID}>
-      <CssVarsProvider>
+    <CssVarsProvider>
+    <ThemeProvider theme={theme}>
+
+      
         <CssBaseline />
           <AuthProvider>
             <RouterProvider router={router} />
           </AuthProvider>
+       
+        </ThemeProvider>
         </CssVarsProvider>
     </GoogleOAuthProvider>
   </React.StrictMode>

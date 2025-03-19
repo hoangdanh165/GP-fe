@@ -14,8 +14,8 @@ export default {
   forgot_password: `${rootPaths.authRoot}/forgot-password`,
 
   // Admin paths
-
-
+  dashboard: `${rootPaths.adminRoot}/dashboard`,
+  chat: `${rootPaths.adminRoot}/chat`,
   // Customer paths
 
 

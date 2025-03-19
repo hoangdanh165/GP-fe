@@ -6,7 +6,7 @@ import paths from "./paths";
 const App = lazy(() => import("../App"));
 
 // Layouts
-
+const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 
 // Auth pages
 const SignIn = lazy(() => import("../pages/auth/sign-in/SignIn"));
@@ -20,7 +20,8 @@ const Banned = lazy(() => import("../pages/error/Banned"));
 const Forbidden = lazy(() => import("../pages/error/Forbidden"));
 
 // Admin pages
-
+const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
+import Chat from "../pages/Chat";
 
 //Sale pages
 
@@ -36,11 +37,11 @@ const PersistSignin = lazy(() => import("../components/utils/PersistSignin"));
 
 
 const createMainLayoutAdminRoutes = () => (
-
+  <AdminLayout>
     <Suspense fallback={<PageLoader />}>
       <Outlet />
     </Suspense>
-
+  </AdminLayout>
 );
 
 const createMainLayoutCustomerRoutes = () => (
@@ -93,15 +94,24 @@ const routes = [
         ),
         children: [
 
-          // {
-          //   path: paths.accounts,
-          //   element: (
-          //     <PrivateRoute allowedRoles={['admin']}>
-          //       <AccountManagement />
-          //     </PrivateRoute>      
-          //   ),
+          {
+            path: paths.dashboard,
+            element: (
+              // <PrivateRoute allowedRoles={['admin']}>
+                <Dashboard />
+              // </PrivateRoute>      
+            ),
 
-          // },
+          },
+          {
+            path: paths.chat,
+            element: (
+              // <PrivateRoute allowedRoles={['admin']}>
+                <Chat />
+              // </PrivateRoute>      
+            ),
+
+          },
           
           
           

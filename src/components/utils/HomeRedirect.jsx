@@ -16,7 +16,7 @@ const HomeRedirect = () => {
     if (auth.role === "customer") {
       return <Navigate to={paths.accounts} />;
     } else if (auth.role === "admin") {
-      return <Navigate to={paths.customer} />;
+      return <Navigate to={paths.dashboard} />;
     } else if (auth.role === "sale") {
       return <Navigate to={paths.sale_contracts} />;
     } 
