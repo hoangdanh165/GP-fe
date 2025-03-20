@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL;
 // Kết nối tới server socket.io
-const socket = io("http://127.0.0.1:8001", {
+const socket = io(SOCKET_URL, {
     transports: ["websocket"],
     reconnection: true,
 });
