@@ -1,72 +1,70 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import ForgotPassword from './components/ForgotPassword';
-import AppTheme from '../../../themes/shared-theme/AppTheme';
-import ColorModeSelect from '../../../themes/shared-theme/ColorModeSelect';
-import { SitemarkIcon } from './components/CustomIcons';
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import axios from '../../../services/axios';
-import useAuth from '../../../hooks/useAuth';
-import GoogleButton from '../../../components/auth/GoogleButton';
-import SnackbarNotification from '../../../components/utils/SnackbarNotification';
-
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import CssBaseline from "@mui/material/CssBaseline";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Divider from "@mui/material/Divider";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
+import Link from "@mui/material/Link";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import MuiCard from "@mui/material/Card";
+import { styled } from "@mui/material/styles";
+import ForgotPassword from "./components/ForgotPassword";
+import AppTheme from "../../../themes/shared-theme/AppTheme";
+import ColorModeSelect from "../../../themes/shared-theme/ColorModeSelect";
+import { SitemarkIcon } from "./components/CustomIcons";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "../../../services/axios";
+import useAuth from "../../../hooks/useAuth";
+import GoogleButton from "../../../components/auth/GoogleButton";
+import SnackbarNotification from "../../../components/utils/SnackbarNotification";
 
 const SIGN_IN_API = import.meta.env.VITE_SIGN_IN_API;
 const SIGN_UP_URL = import.meta.env.VITE_SIGN_UP_URL;
 
 const Card = styled(MuiCard)(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignSelf: 'center',
-  width: '100%',
+  display: "flex",
+  flexDirection: "column",
+  alignSelf: "center",
+  width: "100%",
   padding: theme.spacing(4),
   gap: theme.spacing(2),
-  margin: 'auto',
-  [theme.breakpoints.up('sm')]: {
-    maxWidth: '550px',
+  margin: "auto",
+  [theme.breakpoints.up("sm")]: {
+    maxWidth: "550px",
   },
   boxShadow:
-    'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
-  ...theme.applyStyles('dark', {
+    "hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px",
+  ...theme.applyStyles("dark", {
     boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
+      "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
   }),
 }));
 
-
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
+  height: "calc((1 - var(--template-frame-height, 0)) * 100dvh)",
+  minHeight: "100%",
   padding: theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
+  [theme.breakpoints.up("sm")]: {
     padding: theme.spacing(4),
   },
-  '&::before': {
+  "&::before": {
     content: '""',
-    display: 'block',
-    position: 'absolute',
+    display: "block",
+    position: "absolute",
     zIndex: -1,
     inset: 0,
     backgroundImage:
-      'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
+      "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
+    backgroundRepeat: "no-repeat",
+    ...theme.applyStyles("dark", {
       backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
+        "radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))",
     }),
   },
 }));
@@ -75,18 +73,18 @@ const SignIn = (props) => {
   const navigate = useNavigate();
   const { setAuth, persist, setPersist } = useAuth();
 
-  const [errMsg, setErrMsg] = useState('');
+  const [errMsg, setErrMsg] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const [emailError, setEmailError] = useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
-    setErrMsg('');
+    setErrMsg("");
   };
 
   const handleClickOpen = () => {
@@ -104,18 +102,19 @@ const SignIn = (props) => {
     }
     const data = new FormData(event.currentTarget);
     let email, password;
-    email = data.get('email');
-    password = data.get('password');
+    email = data.get("email");
+    password = data.get("password");
 
     try {
-      const response = await axios.post(SIGN_IN_API,
-          JSON.stringify({ email, password }),
-          {
-              headers: { 'Content-Type': 'application/json' },
-          }
+      const response = await axios.post(
+        SIGN_IN_API,
+        JSON.stringify({ email, password }),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
       );
 
-      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem("isLoggedIn", "true");
       const accessToken = response?.data?.accessToken;
       const role = response?.data?.role;
       const status = response?.data?.status;
@@ -123,9 +122,8 @@ const SignIn = (props) => {
       const fullName = response?.data?.fullName;
 
       setAuth({ email, role, status, accessToken, avatar, fullName });
-      
-      navigate("/auth/sign-up");
-      
+
+      navigate("/");
     } catch (err) {
       console.log(err);
       if (!err?.response) {
@@ -144,27 +142,27 @@ const SignIn = (props) => {
   };
 
   const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
 
     let isValid = true;
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+      setEmailErrorMessage("Please enter a valid email address.");
       isValid = false;
     } else {
       setEmailError(false);
-      setEmailErrorMessage('');
+      setEmailErrorMessage("");
     }
 
     if (!password.value || password.value.length < 8) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 8 characters long.');
+      setPasswordErrorMessage("Password must be at least 8 characters long.");
       isValid = false;
     } else {
       setPasswordError(false);
-      setPasswordErrorMessage('');
+      setPasswordErrorMessage("");
     }
 
     return isValid;
@@ -178,13 +176,15 @@ const SignIn = (props) => {
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <SignInContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+        <ColorModeSelect
+          sx={{ position: "fixed", top: "1rem", right: "1rem" }}
+        />
         <Card variant="outlined">
           <SitemarkIcon />
           <Typography
             component="h1"
             variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
           >
             Sign in
           </Typography>
@@ -193,9 +193,9 @@ const SignIn = (props) => {
             onSubmit={handleSubmit}
             noValidate
             sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
               gap: 2,
             }}
           >
@@ -212,7 +212,7 @@ const SignIn = (props) => {
                 required
                 fullWidth
                 variant="outlined"
-                color={emailError ? 'error' : 'primary'}
+                color={emailError ? "error" : "primary"}
               />
             </FormControl>
             <FormControl>
@@ -228,7 +228,7 @@ const SignIn = (props) => {
                 required
                 fullWidth
                 variant="outlined"
-                color={passwordError ? 'error' : 'primary'}
+                color={passwordError ? "error" : "primary"}
               />
             </FormControl>
             <ForgotPassword open={open} handleClose={handleClose} />
@@ -245,35 +245,38 @@ const SignIn = (props) => {
               type="button"
               onClick={handleClickOpen}
               variant="body2"
-              sx={{ alignSelf: 'center' }}
+              sx={{ alignSelf: "center" }}
             >
               Forgot your password?
             </Link>
           </Box>
           <Divider>or</Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <GoogleButton setErrMsg={setErrMsg} setSnackbarOpen={setSnackbarOpen} />
-            <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <GoogleButton
+              setErrMsg={setErrMsg}
+              setSnackbarOpen={setSnackbarOpen}
+            />
+            <Typography sx={{ textAlign: "center" }}>
+              Don&apos;t have an account?{" "}
               <Link
                 href={SIGN_UP_URL}
                 variant="body2"
-                sx={{ alignSelf: 'center' }}
+                sx={{ alignSelf: "center" }}
               >
                 Sign up
               </Link>
             </Typography>
           </Box>
         </Card>
-        <SnackbarNotification 
-          open={snackbarOpen} 
-          message={errMsg} 
-          severity="error" 
-          onClose={handleSnackbarClose} 
+        <SnackbarNotification
+          open={snackbarOpen}
+          message={errMsg}
+          severity="error"
+          onClose={handleSnackbarClose}
         />
       </SignInContainer>
     </AppTheme>
   );
-}
+};
 
 export default SignIn;

@@ -1,5 +1,5 @@
 import { useGoogleLogin } from "@react-oauth/google";
-import axios from "axios";
+import axios from "../../services/axios";
 import { Button } from "@mui/material";
 import { GoogleIcon } from "../../pages/auth/sign-in/components/CustomIcons";
 import useAuth from "../../hooks/useAuth";

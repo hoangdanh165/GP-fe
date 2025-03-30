@@ -20,12 +20,12 @@ const Message = ({ ownMessage, message }) => {
     >
       {/* Avatar */}
       <Avatar
-        src={ownMessage ? auth.avatar : selectedConversation.avatar}
+        src={ownMessage ? auth.avatar : selectedConversation.userProfilePic}
         sx={{ width: 32, height: 32 }}
       />
 
       {/* Text Message */}
-      {message.text && (
+      {message.message && (
         <Box
           sx={{
             backgroundColor: ownMessage ? "green" : "lightgray",
@@ -37,12 +37,15 @@ const Message = ({ ownMessage, message }) => {
             alignItems: "center",
           }}
         >
-          <Typography>{message.text}</Typography>
+          <Typography>{message.message}</Typography>
           {ownMessage && (
             <IconButton
-              sx={{ marginLeft: 1, color: message.seen ? "blue" : "inherit" }}
+              sx={{
+                marginLeft: 1,
+                color: message.status === "seen" ? "blue" : "inherit",
+              }}
             >
-              {message.seen ? <DoneAllIcon /> : <CheckIcon />}
+              {message.status === "seen" ? <DoneAllIcon /> : <CheckIcon />}
             </IconButton>
           )}
         </Box>

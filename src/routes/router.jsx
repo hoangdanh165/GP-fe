@@ -82,9 +82,9 @@ const routes = [
           {
             path: paths.dashboard,
             element: (
-              // <PrivateRoute allowedRoles={['admin']}>
-              <Dashboard />
-              // </PrivateRoute>
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Dashboard />
+              </PrivateRoute>
             ),
           },
           {

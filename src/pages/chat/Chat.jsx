@@ -21,27 +21,17 @@ import Message from "../../components/chat/Message";
 import Conversation from "../../components/chat/Conversation";
 import MessageContainer from "../../components/chat/MessageContainer";
 import MessageInput from "../../components/chat/MessageInput";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
-import { selectedConversationAtom } from "../../atoms/messagesAtom";
-import useSocket from "../../hooks/useSocket";
+import {
+  selectedConversationAtom,
+  conversationsAtom,
+} from "../../atoms/messagesAtom";
+import { useSocket } from "../../contexts/SocketContext";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 
-const CONVERSATION_API = "/api/v1/conversations";
-const conversationsMock = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    lastMessage: "Hello!",
-    avatar: "https://i.pravatar.cc/150?img=1",
-  },
-  {
-    id: 2,
-    name: "Trần Thị B",
-    lastMessage: "Làm bài tập chưa?",
-    avatar: "https://i.pravatar.cc/150?img=2",
-  },
-];
+const CONVERSATION_API = import.meta.env.VITE_GET_CONVERSATION_API;
 
 export default function ChatUI() {
   const theme = useTheme();
@@ -49,38 +39,13 @@ export default function ChatUI() {
   const axios = useAxiosPrivate();
 
   const [loadingConversations, setLoadingConversations] = useState(true);
-  const [conversations, setConversations] = useState([]);
+
+  const [conversations, setConversations] = useRecoilState(conversationsAtom);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
   );
-  const [message, setMessages] = useState([]);
-  const { messages, sendMessage } = useSocket(selectedConversation?.id);
 
-  const [newMessage, setNewMessage] = useState("");
-  const [typing, setTyping] = useState(false);
-  let typingTimeout = null;
-
-  useEffect(() => {
-    if (typing) {
-      const timeout = setTimeout(() => setTyping(false), 1500);
-      return () => clearTimeout(timeout);
-    }
-  }, [typing]);
-
-  const handleConversationClick = (conv) => {
-    setSelectedConversation(conv);
-    const conversationMessages = {
-      1: [
-        { id: 1, content: "Hello!", sender: "Nguyễn Văn A" },
-        { id: 2, content: "Chào bạn!", sender: "me" },
-      ],
-      2: [
-        { id: 1, content: "Làm bài tập chưa?", sender: "Trần Thị B" },
-        { id: 2, content: "Chưa, có đề không?", sender: "me" },
-      ],
-    };
-    setMessages(conversationMessages[conv.id] || []);
-  };
+  const { socket, onlineUsers } = useSocket();
 
   useEffect(() => {
     try {
@@ -88,7 +53,6 @@ export default function ChatUI() {
         const response = await axios.get(CONVERSATION_API);
         setConversations(response.data);
         console.log("Conversations:", response.data);
-        setConversations(response.data);
       };
       getConversations();
     } catch (error) {
@@ -97,31 +61,6 @@ export default function ChatUI() {
       setLoadingConversations(false);
     }
   }, [setConversations]);
-
-  const handleSend = () => {
-    if (newMessage.trim()) {
-      sendMessage(newMessage);
-      setNewMessage("");
-    }
-  };
-
-  const handleTyping = (e) => {
-    setNewMessage(e.target.value);
-    setTyping(true);
-
-    if (typingTimeout) clearTimeout(typingTimeout);
-    typingTimeout = setTimeout(() => setTyping(false), 1000);
-  };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setMessages([
-        ...messages,
-        { id: messages.length + 1, content: `📎 ${file.name}`, sender: "me" },
-      ]);
-    }
-  };
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -134,6 +73,9 @@ export default function ChatUI() {
       p.full_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
+  useEffect(() => {
+    console.log(filteredConversations);
+  }, [filteredConversations]);
 
   return (
     <Box
@@ -158,7 +100,7 @@ export default function ChatUI() {
           mb={2}
         >
           <Typography variant="h5" color="textPrimary">
-            Đoạn Chat
+            Messages
           </Typography>
           <IconButton color="primary">
             <EditIcon />
@@ -189,16 +131,6 @@ export default function ChatUI() {
           />
         </Box>
 
-        {/* Conversations List */}
-        {filteredConversations.map((conv) => (
-          <Conversation
-            key={conv.id}
-            conversation={conv}
-            isSelected={selectedConversation?.id === conv.id}
-            onClick={() => handleConversationClick(conv)}
-          />
-        ))}
-
         {loadingConversations &&
           [0, 1, 2, 3, 4].map((_, i) => (
             <Stack
@@ -218,6 +150,30 @@ export default function ChatUI() {
               </Stack>
             </Stack>
           ))}
+
+        {/* Conversations List */}
+        {!loadingConversations &&
+          filteredConversations.map((conv) => {
+            // Lọc ra người còn lại trong cuộc trò chuyện (không phải user hiện tại)
+            const otherParticipant =
+              conv?.participants?.find((p) => p.id !== auth?.userId) || null;
+
+            console.log("other", otherParticipant);
+
+            // Kiểm tra xem người kia có online không
+            const isOnline =
+              Array.isArray(onlineUsers) && otherParticipant
+                ? onlineUsers.includes(otherParticipant.id)
+                : false;
+
+            return (
+              <Conversation
+                key={conv.id}
+                conversation={conv}
+                isOnline={isOnline}
+              />
+            );
+          })}
       </Box>
 
       {/* Chat Window */}
@@ -230,96 +186,28 @@ export default function ChatUI() {
         bgcolor={theme.palette.background.paper}
         borderRadius={2}
       >
-        {selectedConversation ? (
-          <>
-            <Box display="flex" alignItems="center" mb={2}>
-              <Avatar src={selectedConversation.avatar} sx={{ mr: 2 }} />
-              <Typography variant="h6" color="textPrimary">
-                {selectedConversation.name}
-              </Typography>
-            </Box>
-            <Box flex={1} overflow="auto" p={2}>
-              {messages.map((msg) => (
-                <Box
-                  key={msg.id}
-                  display="flex"
-                  justifyContent={
-                    msg.sender === "me" ? "flex-end" : "flex-start"
-                  }
-                  mb={1}
-                >
-                  <Box
-                    p={1.5}
-                    borderRadius={2}
-                    bgcolor={
-                      msg.sender === "me"
-                        ? theme.palette.primary.main
-                        : theme.palette.grey[300]
-                    }
-                    color={msg.sender === "me" ? "white" : "black"}
-                    maxWidth="60%"
-                  >
-                    {msg.content}
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-
-            {/* Typing Indicator */}
-            {typing && (
-              <Box display="flex" justifyContent="flex-end" mt={1} pr={2}>
-                <Box
-                  p={1.2}
-                  borderRadius={2}
-                  bgcolor={theme.palette.grey[300]}
-                  maxWidth="fit-content"
-                  display="flex"
-                  alignItems="center"
-                >
-                  <Typography variant="body2" color="textSecondary">
-                    Typing
-                  </Typography>
-                  <Box display="flex" ml={1}>
-                    <Box className="dot" />
-                    <Box className="dot" />
-                    <Box className="dot" />
-                  </Box>
-                </Box>
-              </Box>
-            )}
-
-            <Box display="flex" alignItems="center" mt={2}>
-              <IconButton color="primary" component="label">
-                <input type="file" hidden onChange={handleFileUpload} />
-                <AttachFileIcon />
-              </IconButton>
-              <TextField
-                fullWidth
-                sx={{ ml: 2 }}
-                variant="outlined"
-                placeholder="Nhập tin nhắn..."
-                value={newMessage}
-                onChange={handleTyping}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && !e.shiftKey && handleSend()
-                }
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                sx={{ ml: 2 }}
-                onClick={handleSend}
-              >
-                Gửi
-              </Button>
-            </Box>
-          </>
+        {selectedConversation && selectedConversation._id ? (
+          <MessageContainer />
         ) : (
-          <Typography variant="h6" textAlign="center" color="textSecondary">
-            Chọn một cuộc trò chuyện để bắt đầu!
-          </Typography>
+          <Box
+            flex={1}
+            ml={2}
+            display="flex"
+            flexDirection="column"
+            justifyContent="center"
+            alignItems="center"
+            p={2}
+            bgcolor={theme.palette.background.paper}
+            borderRadius={2}
+          >
+            <ChatBubbleOutlineIcon
+              sx={{ fontSize: 50, color: "gray", mb: 1 }}
+            />
+            <Typography variant="h6" textAlign="center" color="textSecondary">
+              Select a conversation to start messaging!
+            </Typography>
+          </Box>
         )}
-        {selectedConversation._id && <MessageContainer />}
       </Box>
     </Box>
   );

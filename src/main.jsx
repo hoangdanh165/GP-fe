@@ -12,6 +12,7 @@ import "./index.css";
 import { AuthProvider } from "./contexts/AuthProvider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { RecoilRoot } from "recoil";
+import { SocketContextProvider } from "./contexts/SocketContext";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -23,7 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <AuthProvider>
-              <RouterProvider router={router} />
+              <SocketContextProvider>
+                <RouterProvider router={router} />
+              </SocketContextProvider>
             </AuthProvider>
           </ThemeProvider>
         </CssVarsProvider>

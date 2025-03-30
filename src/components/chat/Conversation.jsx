@@ -15,6 +15,8 @@ import { selectedConversationAtom } from "../../atoms/messagesAtom";
 
 const Conversation = ({ conversation, isOnline }) => {
   const theme = useTheme();
+  const borderColor = theme.palette.mode === "dark" ? "#333" : "#FFF";
+
   const { auth } = useAuth();
 
   const user = conversation.participants.find(
@@ -37,7 +39,7 @@ const Conversation = ({ conversation, isOnline }) => {
         borderRadius: 1,
         cursor: "pointer",
         backgroundColor:
-          selectedConversation?._id === conversation._id
+          selectedConversation?._id === conversation.id
             ? theme.palette.action.selected
             : "transparent",
         "&:hover": {
@@ -49,7 +51,7 @@ const Conversation = ({ conversation, isOnline }) => {
           _id: conversation.id,
           userId: user.id,
           userProfilePic: user.avatar,
-          username: user.fullName,
+          username: user.full_name,
           mock: conversation.mock,
         })
       }
@@ -59,8 +61,6 @@ const Conversation = ({ conversation, isOnline }) => {
         {isOnline && (
           <Badge
             color="success"
-            overlap="circular"
-            variant="dot"
             sx={{
               position: "absolute",
               bottom: 0,
@@ -68,8 +68,8 @@ const Conversation = ({ conversation, isOnline }) => {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              backgroundColor: "green",
-              border: "2px solid white",
+              backgroundColor: "#00FF00",
+              border: `1.5px solid ${borderColor}`,
             }}
           />
         )}
@@ -95,7 +95,7 @@ const Conversation = ({ conversation, isOnline }) => {
           ) : null}
           {conversation.last_message?.length > 18
             ? conversation.last_message.substring(0, 18) + "..."
-            : conversation.last_message || <ImageIcon fontSize="small" />}
+            : conversation.last_message}
         </Typography>
       </Stack>
     </ListItem>

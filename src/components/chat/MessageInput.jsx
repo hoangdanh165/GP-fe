@@ -19,8 +19,14 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import ImageIcon from "@mui/icons-material/Image";
 import usePreviewImg from "../../hooks/usePreviewImg";
 import { useRef, useState } from "react";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
+
+const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
 
 const MessageInput = ({ setMessages }) => {
+  const axiosPrivate = useAxiosPrivate();
+  const { auth } = useAuth();
   const [messageText, setMessageText] = useState("");
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const setConversations = useSetRecoilState(conversationsAtom);
@@ -30,50 +36,56 @@ const MessageInput = ({ setMessages }) => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+
     if (!messageText && !imgUrl) return;
     if (isSending) return;
 
     setIsSending(true);
 
     try {
-      const res = await fetch("/api/messages", {
+      const res = await fetch(`${NODE_JS_HOST}/api/v1/messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          sender: auth.userId,
           message: messageText,
-          recipientId: selectedConversation.userId,
-          img: imgUrl,
+          receiver: selectedConversation?.userId, // Check tránh lỗi undefined
+          conversation: selectedConversation?._id, // Check tránh lỗi undefined
         }),
       });
-      const data = await res.json();
-      if (data.error) {
-        console.log(data.error);
-        return;
-      }
-      console.log(data);
-      setMessages((messages) => [...messages, data]);
 
+      if (!res.ok)
+        throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
+
+      const data = await res.json();
+      console.log("✅ Tin nhắn gửi thành công:", data);
+
+      // Cập nhật danh sách tin nhắn
+      setMessages((prevMessages) => [...prevMessages, data]);
+
+      // Cập nhật cuộc hội thoại
       setConversations((prevConvs) => {
+        console.log("🚀 Trước khi cập nhật:", prevConvs);
         const updatedConversations = prevConvs.map((conversation) => {
-          if (conversation._id === selectedConversation._id) {
+          if (conversation.id === selectedConversation._id) {
             return {
               ...conversation,
-              lastMessage: {
-                text: messageText,
-                sender: data.sender,
-              },
+              last_message: data.message,
+              last_sender: data.sender_id,
             };
           }
           return conversation;
         });
         return updatedConversations;
       });
+
+      // Reset input sau khi gửi thành công
       setMessageText("");
       setImgUrl("");
     } catch (error) {
-      console.log(error);
+      console.error("❌ Lỗi khi gửi tin nhắn:", error.message);
     } finally {
       setIsSending(false);
     }

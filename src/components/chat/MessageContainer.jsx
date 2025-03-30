@@ -18,21 +18,28 @@ import {
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { useSocket } from "../../contexts/SocketContext";
 import messageSound from "../../assets/sounds/message.mp3";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
 
 const MessageContainer = () => {
+  const axiosPrivate = useAxiosPrivate();
+  const { auth } = useAuth();
+  const { socket } = useSocket();
+
   const selectedConversation = useRecoilValue(selectedConversationAtom);
+
   const [loadingMessages, setLoadingMessages] = useState(true);
   const [messages, setMessages] = useState([]);
-  const { socket } = useSocket();
+
   const setConversations = useSetRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
 
   useEffect(() => {
     socket.on("newMessage", (message) => {
-      if (selectedConversation._id === message.conversationId) {
+      if (selectedConversation._id === message.conversation) {
         setMessages((prev) => [...prev, message]);
       }
-
+      console.log("RECEIVED: ", message);
       // make a sound if the window is not focused
       if (!document.hasFocus()) {
         const sound = new Audio(messageSound);
@@ -41,13 +48,11 @@ const MessageContainer = () => {
 
       setConversations((prev) => {
         const updatedConversations = prev.map((conversation) => {
-          if (conversation._id === message.conversationId) {
+          if (conversation._id === message.conversation) {
             return {
               ...conversation,
-              lastMessage: {
-                text: message.text,
-                sender: message.sender,
-              },
+              last_message: conversation.message,
+              last_sender: conversation.sender,
             };
           }
           return conversation;
@@ -61,8 +66,7 @@ const MessageContainer = () => {
 
   useEffect(() => {
     const lastMessageIsFromOtherUser =
-      messages.length &&
-      messages[messages.length - 1].sender !== currentUser._id;
+      messages.length && messages[messages.length - 1].sender !== auth.userId;
     if (lastMessageIsFromOtherUser) {
       socket.emit("markMessagesAsSeen", {
         conversationId: selectedConversation._id,
@@ -77,7 +81,7 @@ const MessageContainer = () => {
             if (!message.seen) {
               return {
                 ...message,
-                seen: true,
+                status: "seen",
               };
             }
             return message;
@@ -86,7 +90,7 @@ const MessageContainer = () => {
         });
       }
     });
-  }, [socket, currentUser._id, messages, selectedConversation]);
+  }, [socket, auth.userId, messages, selectedConversation]);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -96,24 +100,24 @@ const MessageContainer = () => {
     const getMessages = async () => {
       setLoadingMessages(true);
       setMessages([]);
+
       try {
         if (selectedConversation.mock) return;
-        const res = await fetch(`/api/messages/${selectedConversation.userId}`);
-        const data = await res.json();
-        if (data.error) {
-          console.log(data.error);
-          return;
-        }
-        setMessages(data);
+
+        const res = await axiosPrivate.get(
+          `/api/v1/messages/by-conversation/${selectedConversation._id}`
+        );
+
+        setMessages(res.data);
       } catch (error) {
-        console.log(error.messsage);
+        console.log(error.message || "Lỗi không xác định");
       } finally {
         setLoadingMessages(false);
       }
     };
 
     getMessages();
-  }, [selectedConversation.userId, selectedConversation.mock]);
+  }, [selectedConversation._id, selectedConversation.mock]);
 
   return (
     <Stack
@@ -177,7 +181,7 @@ const MessageContainer = () => {
         {!loadingMessages &&
           messages.map((message) => (
             <Box
-              key={message._id}
+              key={message.id}
               ref={
                 messages.length - 1 === messages.indexOf(message)
                   ? messageEndRef
@@ -186,7 +190,7 @@ const MessageContainer = () => {
             >
               <Message
                 message={message}
-                ownMessage={currentUser._id === message.sender}
+                ownMessage={auth.userId === message.sender}
               />
             </Box>
           ))}

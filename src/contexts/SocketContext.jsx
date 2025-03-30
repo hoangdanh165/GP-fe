@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRecoilValue } from "recoil";
 import io from "socket.io-client";
 import useAuth from "../hooks/useAuth";
 
 const SocketContext = createContext();
+const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
 
 export const useSocket = () => {
   return useContext(SocketContext);
@@ -15,7 +15,7 @@ export const SocketContextProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    const socket = io("/", {
+    const socket = io(NODE_JS_HOST, {
       query: {
         userId: auth?.userId,
       },
@@ -26,9 +26,11 @@ export const SocketContextProvider = ({ children }) => {
     socket.on("getOnlineUsers", (users) => {
       setOnlineUsers(users);
     });
-    return () => socket && socket.close();
-  }, [user?._id]);
 
+    return () => socket && socket.close();
+  }, [auth?.userId]);
+
+  console.log(onlineUsers);
   return (
     <SocketContext.Provider value={{ socket, onlineUsers }}>
       {children}
