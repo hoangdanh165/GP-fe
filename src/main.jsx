@@ -1,30 +1,33 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
-import { CssBaseline, Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from './themes/theme';
-import router from './routes/router';
-import './index.css';
-import { AuthProvider } from './contexts/AuthProvider';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { RouterProvider } from "react-router-dom";
+import {
+  CssBaseline,
+  Experimental_CssVarsProvider as CssVarsProvider,
+} from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./themes/theme";
+import router from "./routes/router";
+import "./index.css";
+import { AuthProvider } from "./contexts/AuthProvider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { RecoilRoot } from "recoil";
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <GoogleOAuthProvider clientId={CLIENT_ID}>
-    <CssVarsProvider>
-    <ThemeProvider theme={theme}>
-
-      
-        <CssBaseline />
-          <AuthProvider>
-            <RouterProvider router={router} />
-          </AuthProvider>
-       
-        </ThemeProvider>
+    <RecoilRoot>
+      <GoogleOAuthProvider clientId={CLIENT_ID}>
+        <CssVarsProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <AuthProvider>
+              <RouterProvider router={router} />
+            </AuthProvider>
+          </ThemeProvider>
         </CssVarsProvider>
-    </GoogleOAuthProvider>
+      </GoogleOAuthProvider>
+    </RecoilRoot>
   </React.StrictMode>
 );

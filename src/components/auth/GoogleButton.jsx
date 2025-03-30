@@ -1,14 +1,17 @@
-import { useGoogleLogin } from '@react-oauth/google';
-import axios from 'axios';
-import { Button } from '@mui/material';
-import { GoogleIcon } from '../../pages/auth/sign-in/components/CustomIcons';
-import useAuth from '../../hooks/useAuth';
-import { useNavigate, useLocation } from 'react-router-dom';
-
+import { useGoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+import { Button } from "@mui/material";
+import { GoogleIcon } from "../../pages/auth/sign-in/components/CustomIcons";
+import useAuth from "../../hooks/useAuth";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const SIGN_IN_WITH_GOOGLE_API = import.meta.env.VITE_SIGN_IN_WITH_GOOGLE_API;
 
-const GoogleButton = ({ buttonText = "Sign in with Google", setErrMsg, setSnackbarOpen }) => {
+const GoogleButton = ({
+  buttonText = "Sign in with Google",
+  setErrMsg,
+  setSnackbarOpen,
+}) => {
   const { setAuth } = useAuth();
   const navigate = useNavigate();
 
@@ -18,25 +21,26 @@ const GoogleButton = ({ buttonText = "Sign in with Google", setErrMsg, setSnackb
         const res = await axios.post(SIGN_IN_WITH_GOOGLE_API, {
           token: response.access_token,
         });
-        
-        localStorage.setItem('isLoggedIn', 'true');
+
+        localStorage.setItem("isLoggedIn", "true");
         const accessToken = res?.data?.accessToken;
         const role = res?.data?.role;
         const status = res?.data?.status;
         const avatar = res?.data?.avatar;
         const fullName = res?.data?.fullName;
-        
-        setAuth({ email, role, status, accessToken, avatar, fullName });
+        const userId = res?.data?.userId;
 
+        setAuth({ email, role, status, accessToken, avatar, fullName, userId });
+        localStorage.setItem("userId", res?.data?.userId);
         navigate("/");
       } catch (error) {
         setErrMsg(buttonText + " failed!");
-        setSnackbarOpen(true);  
+        setSnackbarOpen(true);
       }
     },
     ux_mode: "redirect",
     onError: () => {
-      setErrMsg(buttonText + " failed!")
+      setErrMsg(buttonText + " failed!");
       setSnackbarOpen(true);
     },
   });

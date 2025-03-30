@@ -1,21 +1,33 @@
 import React, { useState, useEffect } from "react";
+import { useRecoilState } from "recoil";
+
 import {
   Box,
   Typography,
   IconButton,
-  Avatar,
   TextField,
   Button,
   useTheme,
+  Skeleton,
+  Stack,
+  Avatar,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import "./chat.css";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment } from "@mui/material";
+import Message from "../../components/chat/Message";
+import Conversation from "../../components/chat/Conversation";
+import MessageContainer from "../../components/chat/MessageContainer";
+import MessageInput from "../../components/chat/MessageInput";
+
+import { selectedConversationAtom } from "../../atoms/messagesAtom";
 import useSocket from "../../hooks/useSocket";
+import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
+import useAuth from "../../hooks/useAuth";
 
-
+const CONVERSATION_API = "/api/v1/conversations";
 const conversationsMock = [
   {
     id: 1,
@@ -33,7 +45,14 @@ const conversationsMock = [
 
 export default function ChatUI() {
   const theme = useTheme();
-  const [selectedConversation, setSelectedConversation] = useState(null);
+  const { auth } = useAuth();
+  const axios = useAxiosPrivate();
+
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useRecoilState(
+    selectedConversationAtom
+  );
   const [message, setMessages] = useState([]);
   const { messages, sendMessage } = useSocket(selectedConversation?.id);
 
@@ -63,13 +82,28 @@ export default function ChatUI() {
     setMessages(conversationMessages[conv.id] || []);
   };
 
+  useEffect(() => {
+    try {
+      const getConversations = async () => {
+        const response = await axios.get(CONVERSATION_API);
+        setConversations(response.data);
+        console.log("Conversations:", response.data);
+        setConversations(response.data);
+      };
+      getConversations();
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    } finally {
+      setLoadingConversations(false);
+    }
+  }, [setConversations]);
+
   const handleSend = () => {
     if (newMessage.trim()) {
-        sendMessage(newMessage);
-        setNewMessage("");
+      sendMessage(newMessage);
+      setNewMessage("");
     }
-};
-
+  };
 
   const handleTyping = (e) => {
     setNewMessage(e.target.value);
@@ -91,9 +125,15 @@ export default function ChatUI() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredConversations = conversationsMock.filter((conv) =>
-    conv.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredConversations = conversations.filter((conv) => {
+    const otherParticipants = conv.participants.filter(
+      (p) => p.id !== auth.userId
+    );
+
+    return otherParticipants.some((p) =>
+      p.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   return (
     <Box
@@ -148,24 +188,36 @@ export default function ChatUI() {
             }}
           />
         </Box>
+
+        {/* Conversations List */}
         {filteredConversations.map((conv) => (
-          <Box
+          <Conversation
             key={conv.id}
-            display="flex"
-            alignItems="center"
-            p={2}
-            mb={1}
-            bgcolor={
-              selectedConversation?.id === conv.id ? "#3a3b44" : "inherit"
-            }
-            borderRadius={2}
-            sx={{ cursor: "pointer" }}
+            conversation={conv}
+            isSelected={selectedConversation?.id === conv.id}
             onClick={() => handleConversationClick(conv)}
-          >
-            <Avatar src={conv.avatar} sx={{ mr: 2 }} />
-            <Typography color="textPrimary">{conv.name}</Typography>
-          </Box>
+          />
         ))}
+
+        {loadingConversations &&
+          [0, 1, 2, 3, 4].map((_, i) => (
+            <Stack
+              key={i}
+              direction="row"
+              alignItems="center"
+              spacing={2}
+              p={1}
+              borderRadius={2}
+            >
+              <Skeleton variant="circular">
+                <Avatar sx={{ width: 40, height: 40 }} />
+              </Skeleton>
+              <Stack spacing={1} width="100%">
+                <Skeleton variant="text" width={80} height={10} />
+                <Skeleton variant="text" width="90%" height={8} />
+              </Stack>
+            </Stack>
+          ))}
       </Box>
 
       {/* Chat Window */}
@@ -267,6 +319,7 @@ export default function ChatUI() {
             Chọn một cuộc trò chuyện để bắt đầu!
           </Typography>
         )}
+        {selectedConversation._id && <MessageContainer />}
       </Box>
     </Box>
   );
