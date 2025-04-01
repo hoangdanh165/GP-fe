@@ -15,12 +15,11 @@ export default {
 
   // Admin paths
   dashboard: `${rootPaths.adminRoot}/dashboard`,
-  chat: `${rootPaths.adminRoot}/chat`,
+  admin_chat: `${rootPaths.adminRoot}/chat`,
   // Customer paths
-
-
+  abc: `${rootPaths.customerRoot}/dashboard`,
+  customer_chat: `${rootPaths.customerRoot}/chat`,
   // Sale paths
-  
 
   // Error paths
   404: `${rootPaths.errorRoot}/404`,

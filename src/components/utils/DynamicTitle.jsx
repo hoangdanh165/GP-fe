@@ -5,11 +5,12 @@ const titleMap = {
   "/": "Home",
 
   // Auth
-  "/auth/sign-in/": "Sign In",
-  "/auth/sign-up/": "Sign Up",
+  "/auth/sign-in": "Sign In",
+  "/auth/sign-up": "Sign Up",
 
   // Admin
-  "/admin": "Admin Dashboard",
+  "/admin/chat/": "PA - Chat",
+  "/admin/dashboard/": "PA - Dashboard",
 
   // Customer
   "/customer": "Customer",
@@ -17,18 +18,16 @@ const titleMap = {
   // Sale
   "/sale": "Sales Staff",
 
-  
   // Error
-  "/unauthorized/": "Unauthorized",
-  "/forbidden/": "Forbidden",
-  "/banned/": "Account Banned",
+  "/unauthorized": "Unauthorized",
+  "/forbidden": "Forbidden",
+  "/banned": "Account Banned",
   "*": "Page Not Found",
 };
-  
 
 const DynamicTitle = () => {
   const location = useLocation();
-  
+
   useEffect(() => {
     document.title = titleMap[location.pathname] || "Prestige Auto";
   }, [location.pathname]);

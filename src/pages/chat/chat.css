@@ -1,55 +1,31 @@
 @keyframes typingAnimation {
-    0% { opacity: 0.3; transform: translateY(0); }
-    50% { opacity: 1; transform: translateY(-3px); }
-    100% { opacity: 0.3; transform: translateY(0); }
+  0% {
+    opacity: 0.3;
+    transform: translateY(0);
   }
-  
-  .dot {
-    width: 6px;
-    height: 6px;
-    margin-left: 4px;
-    border-radius: 50%;
-    background-color: gray;
-    animation: typingAnimation 1.5s infinite;
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
   }
-  
-  .dot:nth-child(2) {
-    animation-delay: 0.2s;
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
   }
-  
-  .dot:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-  
+}
 
-    /* Toàn bộ scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-      /* Độ rộng */
-      height: 8px;
-    }
-  
-    /* Thanh cuộn */
-    ::-webkit-scrollbar-thumb {
-      background: #4a90e2;
-      /* Màu nền */
-      border-radius: 10px;
-      /* Bo góc */
-    }
-  
-    /* Thanh cuộn khi hover */
-    ::-webkit-scrollbar-thumb:hover {
-      background: #357abd;
-    }
-  
-    /* Track (phần nền scrollbar) */
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      /* Màu nền track */
-      border-radius: 10px;
-    }
-  
-    /* Track khi hover */
-    ::-webkit-scrollbar-track:hover {
-      background: #e1e1e1;
-    }
+.dot {
+  width: 6px;
+  height: 6px;
+  margin-left: 4px;
+  border-radius: 50%;
+  background-color: gray;
+  animation: typingAnimation 1.5s infinite;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}

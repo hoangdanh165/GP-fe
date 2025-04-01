@@ -11,16 +11,15 @@ import {
   Skeleton,
   Stack,
   Avatar,
+  CircularProgress,
 } from "@mui/material";
+import NewConversationDialog from "../../components/chat/NewConversation";
 import EditIcon from "@mui/icons-material/Edit";
 import "./chat.css";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
 import SearchIcon from "@mui/icons-material/Search";
 import { InputAdornment } from "@mui/material";
-import Message from "../../components/chat/Message";
 import Conversation from "../../components/chat/Conversation";
 import MessageContainer from "../../components/chat/MessageContainer";
-import MessageInput from "../../components/chat/MessageInput";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 
 import {
@@ -30,29 +29,93 @@ import {
 import { useSocket } from "../../contexts/SocketContext";
 import useAxiosPrivate from "./../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
+import useShowSnackbar from "../../hooks/useShowSnackbar";
 
-const CONVERSATION_API = import.meta.env.VITE_GET_CONVERSATION_API;
+const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
+const CONVERSATION_API = "/api/v1/conversations/";
+const CREATE_CONVERSATION_API = "/api/v1/conversations/";
+const USERS_LIST_API = "/api/v1/users/get-staff/";
 
 export default function ChatUI() {
   const theme = useTheme();
   const { auth } = useAuth();
   const axios = useAxiosPrivate();
+  const { socket, onlineUsers } = useSocket();
+  const { showSnackbar, Snackbar } = useShowSnackbar();
 
   const [loadingConversations, setLoadingConversations] = useState(true);
+  const [newConversationDialog, setNewConversationDialog] = useState(false);
+  const [staffs, setStaffs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState();
 
   const [conversations, setConversations] = useRecoilState(conversationsAtom);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
     selectedConversationAtom
   );
 
-  const { socket, onlineUsers } = useSocket();
+  const handleCreateConversation = async (staffId) => {
+    showSnackbar("Đăng nhập thành công!", "success");
+    setLoading(true);
+    try {
+      const res = await fetch(`${NODE_JS_HOST}/api/v1/conversations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          conversationStarter: auth.userId,
+          conversationReceiver: staffId,
+        }),
+      });
+
+      if (!res.ok)
+        throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
+
+      const data = await res.json();
+
+      setConversations((prev) => [...prev, data]);
+
+      const opponent = data.participants.find((p) => p.id !== auth.userId);
+
+      setSelectedConversation({
+        _id: data.id,
+        userId: opponent?.id || "",
+        userProfilePic: opponent?.avatar || "",
+        username: opponent?.full_name || "",
+        firstCreated: true,
+      });
+
+      setNewConversationDialog(false);
+      setStaffs([]);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNewConversation = async () => {
+    if (staffs.length == 0) {
+      try {
+        setLoading(true);
+        const response = await axios.get(USERS_LIST_API);
+        setStaffs(response.data);
+        setNewConversationDialog(true);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+      setNewConversationDialog(true);
+    } else setNewConversationDialog(true);
+  };
 
   useEffect(() => {
     try {
       const getConversations = async () => {
         const response = await axios.get(CONVERSATION_API);
         setConversations(response.data);
-        console.log("Conversations:", response.data);
       };
       getConversations();
     } catch (error) {
@@ -61,6 +124,18 @@ export default function ChatUI() {
       setLoadingConversations(false);
     }
   }, [setConversations]);
+
+  useEffect(() => {
+    socket.on("newConversation", (conversationData) => {
+      if (conversationData) {
+        setConversations((prev) => [...prev, conversationData]);
+      }
+    });
+
+    return () => {
+      socket.off("newConversation");
+    };
+  }, [socket]);
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -73,9 +148,6 @@ export default function ChatUI() {
       p.full_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
-  useEffect(() => {
-    console.log(filteredConversations);
-  }, [filteredConversations]);
 
   return (
     <Box
@@ -102,9 +174,18 @@ export default function ChatUI() {
           <Typography variant="h5" color="textPrimary">
             Messages
           </Typography>
-          <IconButton color="primary">
-            <EditIcon />
-          </IconButton>
+          <Box display="flex" alignItems="center">
+            {loading ? (
+              <CircularProgress size={24} color="primary" />
+            ) : (
+              <IconButton
+                color="primary"
+                onClick={() => handleNewConversation()}
+              >
+                <EditIcon />
+              </IconButton>
+            )}
+          </Box>
         </Box>
         {/* Search Bar */}
         <Box
@@ -160,7 +241,6 @@ export default function ChatUI() {
 
             console.log("other", otherParticipant);
 
-            // Kiểm tra xem người kia có online không
             const isOnline =
               Array.isArray(onlineUsers) && otherParticipant
                 ? onlineUsers.includes(otherParticipant.id)
@@ -209,6 +289,14 @@ export default function ChatUI() {
           </Box>
         )}
       </Box>
+      <NewConversationDialog
+        open={newConversationDialog}
+        onClose={() => setNewConversationDialog(false)}
+        staffList={staffs}
+        onCreateConversation={handleCreateConversation}
+        loading={loading}
+      />
+      <Snackbar />
     </Box>
   );
 }

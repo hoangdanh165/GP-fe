@@ -42,10 +42,10 @@ const Message = ({ ownMessage, message }) => {
             <IconButton
               sx={{
                 marginLeft: 1,
-                color: message.status === "seen" ? "blue" : "inherit",
+                color: message.seen === true ? "blue" : "inherit",
               }}
             >
-              {message.status === "seen" ? <DoneAllIcon /> : <CheckIcon />}
+              {message.seen === true ? <DoneAllIcon /> : <CheckIcon />}
             </IconButton>
           )}
         </Box>

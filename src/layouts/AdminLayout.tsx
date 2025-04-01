@@ -26,7 +26,7 @@ const xThemeComponents = {
   ...treeViewCustomizations,
 };
 
-const DashboardLayout = (props) => {
+const AdminLayout = (props) => {
   return (
     <AppTheme {...props} themeComponents={xThemeComponents}>
       <CssBaseline enableColorScheme />
@@ -62,4 +62,4 @@ const DashboardLayout = (props) => {
   );
 };
 
-export default DashboardLayout;
+export default AdminLayout;

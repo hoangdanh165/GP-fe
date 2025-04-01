@@ -1,0 +1,27 @@
+@media (prefers-color-scheme: dark) {
+    ::-webkit-scrollbar-track {
+        background: #1e1e1e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #bbb;
+    }
+}
+
+@media (prefers-color-scheme: light) {
+    ::-webkit-scrollbar-track {
+        background: #f5f5f5;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #aaa;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #666;
+    }
+}

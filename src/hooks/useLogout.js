@@ -1,24 +1,29 @@
+import useAuth from "./useAuth";
 import useAxiosPrivate from "./useAxiosPrivate";
 
 const useLogout = () => {
-    const axiosPrivate = useAxiosPrivate();
+  const axiosPrivate = useAxiosPrivate();
+  const { auth, setAuth } = useAuth();
 
-    const logout = async () => {
-        localStorage.removeItem('persist');
-        try {
-            axiosPrivate.post('/api/v1/users/log-out/', 
-            {}, 
-            {
-                withCredentials: true
-            });            
+  const logout = async () => {
+    localStorage.removeItem("persist");
+    localStorage.removeItem("isLoggedIn");
+    setAuth(null);
 
-        } catch (err) {
-            console.error(err);
+    try {
+      axiosPrivate.post(
+        "/api/v1/users/log-out/",
+        {},
+        {
+          withCredentials: true,
         }
-        
+      );
+    } catch (err) {
+      console.error(err);
     }
+  };
 
-    return logout;
-}
+  return logout;
+};
 
-export default useLogout
+export default useLogout;

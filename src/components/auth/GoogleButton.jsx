@@ -22,7 +22,7 @@ const GoogleButton = ({
           token: response.access_token,
         });
 
-        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("isSignedIn", "true");
         const accessToken = res?.data?.accessToken;
         const role = res?.data?.role;
         const status = res?.data?.status;
@@ -31,7 +31,6 @@ const GoogleButton = ({
         const userId = res?.data?.userId;
 
         setAuth({ email, role, status, accessToken, avatar, fullName, userId });
-        localStorage.setItem("userId", res?.data?.userId);
         navigate("/");
       } catch (error) {
         setErrMsg(buttonText + " failed!");

@@ -1,13 +1,13 @@
 import { Navigate } from "react-router-dom";
 
 const IsSignedIn = ({ children }) => {
-    const isLoggedIn = localStorage.getItem("IsSignedIn") === "true";
+  const isSignedIn = localStorage.getItem("isSignedIn") === "true";
 
-    if (IsSignedIn) {
-        return <Navigate to={"/"} replace />;
-    }
+  if (isSignedIn) {
+    return <Navigate to={"/"} replace />;
+  }
 
-    return children;
-}
+  return children;
+};
 
 export default IsSignedIn;

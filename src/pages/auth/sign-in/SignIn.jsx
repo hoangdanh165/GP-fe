@@ -114,7 +114,7 @@ const SignIn = (props) => {
         }
       );
 
-      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("isSignedIn", "true");
       const accessToken = response?.data?.accessToken;
       const role = response?.data?.role;
       const status = response?.data?.status;

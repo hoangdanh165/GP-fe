@@ -28,7 +28,7 @@ import Chat from "../pages/chat/Chat";
 // Other components
 import PrivateRoute from "../components/utils/PrivateRoute";
 import HomeRedirect from "../components/utils/HomeRedirect";
-import IsLoggedIn from "../components/utils/IsSignedIn";
+import IsSignedIn from "../components/utils/IsSignedIn";
 import PageLoader from "../components/loading/PageLoader";
 import Splash from "../components/loading/Splash";
 const PersistSignin = lazy(() => import("../components/utils/PersistSignin"));
@@ -88,7 +88,7 @@ const routes = [
             ),
           },
           {
-            path: paths.chat,
+            path: paths.admin_chat,
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
                 <Chat />
@@ -135,25 +135,25 @@ const routes = [
           {
             path: paths.sign_in,
             element: (
-              // <IsLoggedIn>
-              <SignIn />
-              // </IsLoggedIn>
+              <IsSignedIn>
+                <SignIn />
+              </IsSignedIn>
             ),
           },
           {
             path: paths.sign_up,
             element: (
-              // <IsLoggedIn>
+              // <IsSignedIn>
               <SignUp />
-              // </IsLoggedIn>
+              // </IsSignedIn>
             ),
           },
           // {
           //   path: paths.forgot_password,
           //   element: (
-          //     <IsLoggedIn>
+          //     <IsSignedIn>
           //       <ForgotPassword />
-          //     </IsLoggedIn>
+          //     </IsSignedIn>
           //   )
           // },
         ],

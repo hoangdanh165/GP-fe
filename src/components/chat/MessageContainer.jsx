@@ -6,6 +6,8 @@ import {
   Skeleton,
   Typography,
   IconButton,
+  Badge,
+  useTheme,
 } from "@mui/material";
 import Message from "./Message";
 import MessageInput from "./MessageInput";
@@ -22,25 +24,30 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 
 const MessageContainer = () => {
+  const theme = useTheme();
+  const borderColor = theme.palette.mode === "dark" ? "#333" : "#FFF";
+
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
-  const { socket } = useSocket();
+  const { socket, onlineUsers } = useSocket();
+  let isOnline;
 
   const selectedConversation = useRecoilValue(selectedConversationAtom);
 
-  const [loadingMessages, setLoadingMessages] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const [messages, setMessages] = useState([]);
 
   const setConversations = useSetRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
+
+  isOnline = onlineUsers.includes(selectedConversation.userId);
 
   useEffect(() => {
     socket.on("newMessage", (message) => {
       if (selectedConversation._id === message.conversation) {
         setMessages((prev) => [...prev, message]);
       }
-      console.log("RECEIVED: ", message);
-      // make a sound if the window is not focused
+
       if (!document.hasFocus()) {
         const sound = new Audio(messageSound);
         sound.play();
@@ -48,11 +55,11 @@ const MessageContainer = () => {
 
       setConversations((prev) => {
         const updatedConversations = prev.map((conversation) => {
-          if (conversation._id === message.conversation) {
+          if (conversation.id === message.conversation) {
             return {
               ...conversation,
-              last_message: conversation.message,
-              last_sender: conversation.sender,
+              last_message: message.message,
+              last_sender: message.sender,
             };
           }
           return conversation;
@@ -81,7 +88,7 @@ const MessageContainer = () => {
             if (!message.seen) {
               return {
                 ...message,
-                status: "seen",
+                seen: true,
               };
             }
             return message;
@@ -98,26 +105,25 @@ const MessageContainer = () => {
 
   useEffect(() => {
     const getMessages = async () => {
-      setLoadingMessages(true);
       setMessages([]);
+      if (!selectedConversation.firstCreated) {
+        setLoadingMessages(true);
+        try {
+          const res = await axiosPrivate.get(
+            `/api/v1/messages/by-conversation/${selectedConversation._id}`
+          );
 
-      try {
-        if (selectedConversation.mock) return;
-
-        const res = await axiosPrivate.get(
-          `/api/v1/messages/by-conversation/${selectedConversation._id}`
-        );
-
-        setMessages(res.data);
-      } catch (error) {
-        console.log(error.message || "Lỗi không xác định");
-      } finally {
-        setLoadingMessages(false);
+          setMessages(res.data);
+        } catch (error) {
+          console.log(error.message || "Lỗi không xác định");
+        } finally {
+          setLoadingMessages(false);
+        }
       }
     };
 
     getMessages();
-  }, [selectedConversation._id, selectedConversation.mock]);
+  }, [selectedConversation._id, selectedConversation.firstCreated]);
 
   return (
     <Stack
@@ -137,10 +143,27 @@ const MessageContainer = () => {
         spacing={2}
         sx={{ height: 48 }}
       >
-        <Avatar
-          src={selectedConversation.userProfilePic}
-          sx={{ width: 32, height: 32 }}
-        />
+        <Box sx={{ position: "relative", display: "inline-block" }}>
+          <Avatar
+            src={selectedConversation.userProfilePic}
+            sx={{ width: 32, height: 32 }}
+          />
+          {isOnline && (
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: 0,
+                right: 0,
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                backgroundColor: "#00FF00",
+                border: `1.5px solid ${borderColor}`,
+              }}
+            />
+          )}
+        </Box>
+
         <Typography variant="body1" fontWeight="bold">
           {selectedConversation.username}
         </Typography>

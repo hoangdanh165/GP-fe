@@ -62,18 +62,15 @@ const MessageInput = ({ setMessages }) => {
       const data = await res.json();
       console.log("✅ Tin nhắn gửi thành công:", data);
 
-      // Cập nhật danh sách tin nhắn
       setMessages((prevMessages) => [...prevMessages, data]);
 
-      // Cập nhật cuộc hội thoại
       setConversations((prevConvs) => {
-        console.log("🚀 Trước khi cập nhật:", prevConvs);
         const updatedConversations = prevConvs.map((conversation) => {
           if (conversation.id === selectedConversation._id) {
             return {
               ...conversation,
               last_message: data.message,
-              last_sender: data.sender_id,
+              last_sender: data.sender,
             };
           }
           return conversation;
@@ -81,7 +78,6 @@ const MessageInput = ({ setMessages }) => {
         return updatedConversations;
       });
 
-      // Reset input sau khi gửi thành công
       setMessageText("");
       setImgUrl("");
     } catch (error) {
@@ -93,7 +89,6 @@ const MessageInput = ({ setMessages }) => {
 
   return (
     <Stack direction="row" alignItems="center" spacing={2}>
-      {/* Input Nhập Tin Nhắn */}
       <Box component="form" onSubmit={handleSendMessage} sx={{ flex: 1 }}>
         <TextField
           fullWidth
@@ -111,13 +106,11 @@ const MessageInput = ({ setMessages }) => {
         />
       </Box>
 
-      {/* Upload Ảnh */}
       <IconButton onClick={() => imageRef.current.click()} size="large">
         <ImageIcon />
       </IconButton>
       <input type="file" hidden ref={imageRef} onChange={handleImageChange} />
 
-      {/* Dialog Hiển Thị Ảnh Preview */}
       <Dialog
         open={Boolean(imgUrl)}
         onClose={() => setImgUrl("")}
