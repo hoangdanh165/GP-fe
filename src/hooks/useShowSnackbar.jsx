@@ -16,12 +16,12 @@ const useShowSnackbar = () => {
     setSnackbar((prev) => ({ ...prev, open: false }));
   };
 
-  const Snackbar = () => (
+  const CustomSnackbar = () => (
     <Snackbar
       open={snackbar.open}
       autoHideDuration={3000}
       onClose={closeSnackbar}
-      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
     >
       <Alert
         onClose={closeSnackbar}
@@ -33,7 +33,7 @@ const useShowSnackbar = () => {
     </Snackbar>
   );
 
-  return { showSnackbar, Snackbar };
+  return { showSnackbar, CustomSnackbar };
 };
 
 export default useShowSnackbar;

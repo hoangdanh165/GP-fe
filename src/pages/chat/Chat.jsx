@@ -41,7 +41,7 @@ export default function ChatUI() {
   const { auth } = useAuth();
   const axios = useAxiosPrivate();
   const { socket, onlineUsers } = useSocket();
-  const { showSnackbar, Snackbar } = useShowSnackbar();
+  const { showSnackbar, CustomSnackbar } = useShowSnackbar();
 
   const [loadingConversations, setLoadingConversations] = useState(true);
   const [newConversationDialog, setNewConversationDialog] = useState(false);
@@ -55,7 +55,6 @@ export default function ChatUI() {
   );
 
   const handleCreateConversation = async (staffId) => {
-    showSnackbar("Đăng nhập thành công!", "success");
     setLoading(true);
     try {
       const res = await fetch(`${NODE_JS_HOST}/api/v1/conversations`, {
@@ -90,6 +89,7 @@ export default function ChatUI() {
       setStaffs([]);
     } catch (error) {
       console.log(error);
+      showSnackbar("Error creating conversation", "info");
     } finally {
       setLoading(false);
     }
@@ -104,6 +104,7 @@ export default function ChatUI() {
         setNewConversationDialog(true);
       } catch (error) {
         console.log(error);
+        showSnackbar("Error fetching staffs!", "error");
       } finally {
         setLoading(false);
       }
@@ -120,6 +121,7 @@ export default function ChatUI() {
       getConversations();
     } catch (error) {
       console.error("Error fetching conversations:", error);
+      showSnackbar("Error fetching conversations!", "error");
     } finally {
       setLoadingConversations(false);
     }
@@ -296,7 +298,7 @@ export default function ChatUI() {
         onCreateConversation={handleCreateConversation}
         loading={loading}
       />
-      <Snackbar />
+      <CustomSnackbar />
     </Box>
   );
 }

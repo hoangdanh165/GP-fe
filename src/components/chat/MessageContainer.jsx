@@ -22,10 +22,12 @@ import { useSocket } from "../../contexts/SocketContext";
 import messageSound from "../../assets/sounds/message.mp3";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
+import useShowSnackbar from "../../hooks/useShowSnackbar";
 
 const MessageContainer = () => {
   const theme = useTheme();
   const borderColor = theme.palette.mode === "dark" ? "#333" : "#FFF";
+  const { showSnackbar, CustomSnackbar } = useShowSnackbar();
 
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
@@ -115,7 +117,8 @@ const MessageContainer = () => {
 
           setMessages(res.data);
         } catch (error) {
-          console.log(error.message || "Lỗi không xác định");
+          console.log(error.message || "Unidentified error!");
+          showSnackbar(error.message, "info");
         } finally {
           setLoadingMessages(false);
         }
@@ -220,6 +223,7 @@ const MessageContainer = () => {
       </Box>
 
       <MessageInput setMessages={setMessages} />
+      <CustomSnackbar />
     </Stack>
   );
 };
