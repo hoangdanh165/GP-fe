@@ -177,7 +177,7 @@ export default function ChatUI() {
           </Typography>
           <Box display="flex" alignItems="center">
             {loading ? (
-              <CircularProgress size={24} color="primary" />
+              <CircularProgress size={40} color="primary" />
             ) : (
               <IconButton
                 color="primary"
@@ -195,7 +195,7 @@ export default function ChatUI() {
           mb={2}
           bgcolor="inherit"
           borderRadius={2}
-          p={1}
+          // p={1}
         >
           <TextField
             fullWidth

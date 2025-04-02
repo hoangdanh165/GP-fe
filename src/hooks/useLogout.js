@@ -7,7 +7,7 @@ const useLogout = () => {
 
   const logout = async () => {
     localStorage.removeItem("persist");
-    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("isSignedIn");
     setAuth(null);
 
     try {

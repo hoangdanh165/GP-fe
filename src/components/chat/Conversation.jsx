@@ -10,6 +10,7 @@ import {
 import { useRecoilState, useRecoilValue } from "recoil";
 import useAuth from "../../hooks/useAuth";
 import CheckIcon from "@mui/icons-material/Check";
+import { BsCheck2All } from "react-icons/bs";
 import ImageIcon from "@mui/icons-material/Image";
 import { selectedConversationAtom } from "../../atoms/messagesAtom";
 
@@ -88,9 +89,14 @@ const Conversation = ({ conversation, isOnline }) => {
         >
           {auth.userId === conversation.last_sender ? (
             <Box
-              color={conversation.last_message_seen ? "blue.400" : "gray.500"}
+              color={conversation.last_message_seen ? "blue.400" : "gray.500"} 
+              sx={{
+                 display: "flex",
+          alignItems: "center", 
+          justifyContent: "center",
+              }}
             >
-              <CheckIcon fontSize="small" />
+              <BsCheck2All size={16} />
             </Box>
           ) : null}
           {conversation.last_message?.length > 18

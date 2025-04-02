@@ -47,11 +47,11 @@ export default function SideMenuMobile({ open, toggleDrawer }: SideMenuMobilePro
             <Avatar
               sizes="small"
               alt=""
-              src={ auth.avatar }
+              src={ auth?.avatar }
               sx={{ width: 24, height: 24 }}
             />
             <Typography component="p" variant="h6">
-              { auth.fullName }
+              { auth?.fullName }
             </Typography>
           </Stack>
           <MenuButton showBadge>

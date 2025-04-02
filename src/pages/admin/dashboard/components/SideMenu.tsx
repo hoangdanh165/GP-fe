@@ -24,7 +24,7 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
-  const { auth } = useAuth(); 
+  const { auth } = useAuth();
 
   return (
     <Drawer
@@ -87,15 +87,24 @@ export default function SideMenu() {
         <Avatar
           sizes="small"
           alt=""
-          src={auth.avatar}
+          src={auth?.avatar}
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            {auth.fullName}
+            {auth?.fullName}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {auth.email}
+          <Typography
+            variant="caption"
+            sx={{
+              color: 'text.secondary',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              maxWidth: 'calc(100% - 10px)',
+            }}
+          >
+            {auth?.email?.length > 15 ? `${auth.email.substring(0, 15)}...` : auth?.email}
           </Typography>
         </Box>
         <OptionsMenu />

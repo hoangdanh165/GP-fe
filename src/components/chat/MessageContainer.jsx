@@ -176,7 +176,7 @@ const MessageContainer = () => {
 
       <Divider />
 
-      <Box sx={{ flex: 1, overflowY: "auto", p: 2 }}>
+      <Box sx={{ flex: 1, overflowY: "auto", pb: 2, pr: 0.5, pl: 0.5, pt:2 }}>
         {/* Loading Skeletons */}
         {loadingMessages &&
           [...Array(5)].map((_, i) => (
@@ -196,11 +196,21 @@ const MessageContainer = () => {
               {i % 2 === 0 && (
                 <Skeleton variant="circular" width={28} height={28} />
               )}
-              <Stack spacing={1} sx={{ width: "100%" }}>
-                <Skeleton variant="rounded" width="100%" height={10} />
-                <Skeleton variant="rounded" width="100%" height={10} />
-                <Skeleton variant="rounded" width="100%" height={10} />
+              {i % 2 === 0 && (
+                <Stack spacing={1} sx={{ width: "100%" }}>
+                <Skeleton variant="rounded" width="50%" height={15} />
+                <Skeleton variant="rounded" width="70%" height={15} />
+                <Skeleton variant="rounded" width="60%" height={15} />
               </Stack>
+              )}
+              {i % 2 !== 0 && (
+                <Stack spacing={1} sx={{ width: "100%" }} alignItems={"flex-end"}>
+                <Skeleton variant="rounded" width="70%" height={15} />
+                <Skeleton variant="rounded" width="60%" height={15} />
+                <Skeleton variant="rounded" width="40%" height={15} />
+              </Stack>
+              )}
+              
               {i % 2 !== 0 && (
                 <Skeleton variant="circular" width={28} height={28} />
               )}
@@ -232,7 +242,7 @@ const MessageContainer = () => {
         )}
         {!loadingMessages &&
           messages.length > 0 &&
-          messages.map((message) => (
+          messages.map((message, index) => (
             <Box
               key={message.id}
               ref={
@@ -244,6 +254,7 @@ const MessageContainer = () => {
               <Message
                 message={message}
                 ownMessage={auth.userId === message.sender}
+                isLastMessage={index === messages.length - 1}
               />
             </Box>
           ))}

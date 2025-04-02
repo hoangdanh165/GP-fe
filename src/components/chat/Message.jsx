@@ -8,7 +8,7 @@ import { BsCheck2All } from "react-icons/bs";
 
 import useAuth from "./../../hooks/useAuth";
 
-const Message = ({ ownMessage, message }) => {
+const Message = ({ ownMessage, message, isLastMessage }) => {
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const { auth } = useAuth();
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -21,33 +21,54 @@ const Message = ({ ownMessage, message }) => {
       flexDirection={ownMessage ? "row-reverse" : "row"}
     >
       {/* Avatar */}
-      <Avatar
-        src={ownMessage ? auth.avatar : selectedConversation.userProfilePic}
-        sx={{ width: 35, height: 35, alignSelf: "center" }}
-      />
+      {!ownMessage && (
+        <Avatar
+          src={selectedConversation.userProfilePic}
+          sx={{ width: 35, height: 35, alignSelf: "center" }}
+        />
+      )}
 
       {/* Text Message */}
       {message.message && (
         <Box
           sx={{
-            backgroundColor: ownMessage ? "lightgray" : "#5C5F62",
-            color: ownMessage ? "black" : "white",
-            padding: "7px",
-            borderRadius: "10px",
-            maxWidth: "350px",
             display: "flex",
-            alignItems: "center",
-            mb: 0.5,
-            mt: 0.5,
+            flexDirection: "column",
+            alignItems: ownMessage ? "flex-end" : "flex-start",
           }}
         >
-          <Typography>{message.message}</Typography>
-          {ownMessage && (
+          <Box
+            sx={{
+              backgroundColor: ownMessage ? "lightgray" : "#5C5F62",
+              color: ownMessage ? "black" : "white",
+              padding: "7px",
+              borderRadius: "10px",
+              maxWidth: "350px",
+              display: "flex",
+              alignItems: "center",
+              mb: 0.1,
+              mt: 0.1,
+              wordWrap: "break-word",
+            }}
+          >
+            <Typography
+              sx={{
+                maxWidth: "100%",
+                wordBreak: "break-word",
+              }}
+            >
+              {message.message}
+            </Typography>
+          </Box>
+          {ownMessage && isLastMessage && (
             <Box
-              alignSelf={"flex-end"}
-              ml={1}
-              color={message.seen ? "blue.400" : ""}
-              fontWeight={"bold"}
+              sx={{
+                alignSelf: "flex-end",
+                mt: 0.5,
+                mr: 0,
+                color: message.seen ? "blue" : "",
+                fontWeight: "bold",
+              }}
             >
               <BsCheck2All size={16} />
             </Box>
