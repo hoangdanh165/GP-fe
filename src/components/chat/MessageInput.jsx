@@ -21,12 +21,15 @@ import usePreviewImg from "../../hooks/usePreviewImg";
 import { useRef, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
+import useShowSnackbar from "../../hooks/useShowSnackbar";
 
 const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
 
 const MessageInput = ({ setMessages }) => {
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
+  const { showSnackbar, CustomSnackbar } = useShowSnackbar();
+
   const [messageText, setMessageText] = useState("");
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const setConversations = useSetRecoilState(conversationsAtom);
@@ -51,16 +54,15 @@ const MessageInput = ({ setMessages }) => {
         body: JSON.stringify({
           sender: auth.userId,
           message: messageText,
-          receiver: selectedConversation?.userId, // Check tránh lỗi undefined
-          conversation: selectedConversation?._id, // Check tránh lỗi undefined
+          receiver: selectedConversation?.userId,
+          conversation: selectedConversation?._id,
         }),
       });
 
       if (!res.ok)
-        throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
 
       const data = await res.json();
-      console.log("✅ Tin nhắn gửi thành công:", data);
 
       setMessages((prevMessages) => [...prevMessages, data]);
 
@@ -81,14 +83,20 @@ const MessageInput = ({ setMessages }) => {
       setMessageText("");
       setImgUrl("");
     } catch (error) {
-      console.error("❌ Lỗi khi gửi tin nhắn:", error.message);
+      console.error("Error sending message: ", error.message);
+      showSnackbar(error.message, "error");
     } finally {
       setIsSending(false);
     }
   };
 
   return (
-    <Stack direction="row" alignItems="center" spacing={2}>
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={1}
+      sx={{ width: "100%" }}
+    >
       <Box component="form" onSubmit={handleSendMessage} sx={{ flex: 1 }}>
         <TextField
           fullWidth
@@ -96,21 +104,52 @@ const MessageInput = ({ setMessages }) => {
           placeholder="Type a message..."
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <IconButton onClick={handleSendMessage} disabled={isSending}>
-                <SendIcon />
-              </IconButton>
-            ),
+          sx={{
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "20px",
+              paddingRight: "12px", // Để nút không bị tràn
+            },
           }}
         />
       </Box>
 
-      <IconButton onClick={() => imageRef.current.click()} size="large">
-        <ImageIcon />
-      </IconButton>
-      <input type="file" hidden ref={imageRef} onChange={handleImageChange} />
+      {/* Nút Gửi hoặc Chọn ảnh */}
+      {messageText.length > 0 ? (
+        <IconButton
+          onClick={handleSendMessage}
+          disabled={isSending}
+          sx={{
+            border: "none",
+            outline: "none",
+            bgcolor: "transparent",
+            "&:hover": { bgcolor: "transparent" },
+          }}
+        >
+          <SendIcon />
+        </IconButton>
+      ) : (
+        <>
+          <IconButton
+            onClick={() => imageRef.current.click()}
+            sx={{
+              border: "none",
+              outline: "none",
+              bgcolor: "transparent",
+              "&:hover": { bgcolor: "transparent" },
+            }}
+          >
+            <ImageIcon />
+          </IconButton>
+          <input
+            type="file"
+            hidden
+            ref={imageRef}
+            onChange={handleImageChange}
+          />
+        </>
+      )}
 
+      {/* Dialog preview ảnh */}
       <Dialog
         open={Boolean(imgUrl)}
         onClose={() => setImgUrl("")}
@@ -135,6 +174,8 @@ const MessageInput = ({ setMessages }) => {
           )}
         </DialogActions>
       </Dialog>
+
+      <CustomSnackbar />
     </Stack>
   );
 };

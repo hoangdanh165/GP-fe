@@ -47,7 +47,6 @@ export default function ChatUI() {
   const [newConversationDialog, setNewConversationDialog] = useState(false);
   const [staffs, setStaffs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedStaff, setSelectedStaff] = useState();
 
   const [conversations, setConversations] = useRecoilState(conversationsAtom);
   const [selectedConversation, setSelectedConversation] = useRecoilState(
@@ -69,7 +68,7 @@ export default function ChatUI() {
       });
 
       if (!res.ok)
-        throw new Error(`Lỗi server: ${res.status} ${res.statusText}`);
+        throw new Error(`Server error: ${res.status} ${res.statusText}`);
 
       const data = await res.json();
 
@@ -89,7 +88,7 @@ export default function ChatUI() {
       setStaffs([]);
     } catch (error) {
       console.log(error);
-      showSnackbar("Error creating conversation", "info");
+      showSnackbar("Error creating conversation", "error");
     } finally {
       setLoading(false);
     }
@@ -201,7 +200,7 @@ export default function ChatUI() {
           <TextField
             fullWidth
             variant="outlined"
-            placeholder="Tìm kiếm..."
+            placeholder="Search for a conversation..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
@@ -213,9 +212,9 @@ export default function ChatUI() {
             }}
           />
         </Box>
-
+        {/* Skeleton when loading */}
         {loadingConversations &&
-          [0, 1, 2, 3, 4].map((_, i) => (
+          [...Array(5)].map((_, i) => (
             <Stack
               key={i}
               direction="row"
@@ -237,7 +236,6 @@ export default function ChatUI() {
         {/* Conversations List */}
         {!loadingConversations &&
           filteredConversations.map((conv) => {
-            // Lọc ra người còn lại trong cuộc trò chuyện (không phải user hiện tại)
             const otherParticipant =
               conv?.participants?.find((p) => p.id !== auth?.userId) || null;
 
@@ -264,7 +262,6 @@ export default function ChatUI() {
         ml={2}
         display="flex"
         flexDirection="column"
-        p={2}
         bgcolor={theme.palette.background.paper}
         borderRadius={2}
       >

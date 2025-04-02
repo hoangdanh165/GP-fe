@@ -4,6 +4,8 @@ import { useState } from "react";
 import CheckIcon from "@mui/icons-material/Check";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { selectedConversationAtom } from "../../atoms/messagesAtom";
+import { BsCheck2All } from "react-icons/bs";
+
 import useAuth from "./../../hooks/useAuth";
 
 const Message = ({ ownMessage, message }) => {
@@ -21,32 +23,34 @@ const Message = ({ ownMessage, message }) => {
       {/* Avatar */}
       <Avatar
         src={ownMessage ? auth.avatar : selectedConversation.userProfilePic}
-        sx={{ width: 32, height: 32 }}
+        sx={{ width: 35, height: 35, alignSelf: "center" }}
       />
 
       {/* Text Message */}
       {message.message && (
         <Box
           sx={{
-            backgroundColor: ownMessage ? "green" : "lightgray",
-            color: ownMessage ? "white" : "black",
-            padding: "8px",
-            borderRadius: "8px",
+            backgroundColor: ownMessage ? "lightgray" : "#5C5F62",
+            color: ownMessage ? "black" : "white",
+            padding: "7px",
+            borderRadius: "10px",
             maxWidth: "350px",
             display: "flex",
             alignItems: "center",
+            mb: 0.5,
+            mt: 0.5,
           }}
         >
           <Typography>{message.message}</Typography>
           {ownMessage && (
-            <IconButton
-              sx={{
-                marginLeft: 1,
-                color: message.seen === true ? "blue" : "inherit",
-              }}
+            <Box
+              alignSelf={"flex-end"}
+              ml={1}
+              color={message.seen ? "blue.400" : ""}
+              fontWeight={"bold"}
             >
-              {message.seen === true ? <DoneAllIcon /> : <CheckIcon />}
-            </IconButton>
+              <BsCheck2All size={16} />
+            </Box>
           )}
         </Box>
       )}

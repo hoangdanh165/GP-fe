@@ -132,9 +132,11 @@ const MessageContainer = () => {
     <Stack
       flex={70}
       sx={{
-        bgcolor: "background.default",
+        bgcolor: theme.palette.mode === "dark" ? "#2a2b34" : "#f0f0f0",
         borderRadius: 2,
-        p: 2,
+        pl: 2,
+        pr: 2,
+        pb: 2,
         height: "100%",
       }}
       direction="column"
@@ -144,12 +146,12 @@ const MessageContainer = () => {
         direction="row"
         alignItems="center"
         spacing={2}
-        sx={{ height: 48 }}
+        sx={{ height: 60 }}
       >
         <Box sx={{ position: "relative", display: "inline-block" }}>
           <Avatar
             src={selectedConversation.userProfilePic}
-            sx={{ width: 32, height: 32 }}
+            sx={{ width: 40, height: 40 }}
           />
           {isOnline && (
             <Box
@@ -183,19 +185,21 @@ const MessageContainer = () => {
               direction="row"
               spacing={2}
               alignItems="center"
+              justifyContent="center"
               sx={{
                 p: 1,
                 borderRadius: 1,
-                alignSelf: i % 2 === 0 ? "flex-start" : "flex-end",
+                width: "100%",
+                marginBottom: 1,
               }}
             >
               {i % 2 === 0 && (
                 <Skeleton variant="circular" width={28} height={28} />
               )}
-              <Stack spacing={1}>
-                <Skeleton variant="rounded" width={250} height={10} />
-                <Skeleton variant="rounded" width={250} height={10} />
-                <Skeleton variant="rounded" width={250} height={10} />
+              <Stack spacing={1} sx={{ width: "100%" }}>
+                <Skeleton variant="rounded" width="100%" height={10} />
+                <Skeleton variant="rounded" width="100%" height={10} />
+                <Skeleton variant="rounded" width="100%" height={10} />
               </Stack>
               {i % 2 !== 0 && (
                 <Skeleton variant="circular" width={28} height={28} />
@@ -204,7 +208,30 @@ const MessageContainer = () => {
           ))}
 
         {/* Messages */}
+        {!loadingMessages && messages.length === 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100%",
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              textAlign="center"
+              sx={{
+                fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" },
+                fontWeight: "bold",
+              }}
+            >
+              Text something to start this conversation.
+            </Typography>
+          </Box>
+        )}
         {!loadingMessages &&
+          messages.length > 0 &&
           messages.map((message) => (
             <Box
               key={message.id}

@@ -5,7 +5,7 @@ const useShowSnackbar = () => {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "info",
+    severity: "",
   });
 
   const showSnackbar = useCallback((message, severity = "info") => {
