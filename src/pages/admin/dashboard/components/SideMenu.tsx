@@ -72,7 +72,6 @@ export default function SideMenu() {
         }}
       >
         <MenuContent />
-        {/* <CardAlert /> */}
       </Box>
       <Stack
         direction="row"

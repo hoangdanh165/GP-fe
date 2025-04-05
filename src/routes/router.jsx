@@ -21,7 +21,10 @@ const Forbidden = lazy(() => import("../pages/error/Forbidden"));
 
 // Admin pages
 const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
-import Chat from "../pages/chat/Chat";
+const AccountsManagement = lazy(() =>
+  import("../pages/admin/accounts-management/AccountsManagement")
+);
+const Chat = lazy(() => import("../pages/chat/Chat"));
 
 //Sale pages
 
@@ -92,6 +95,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
                 <Chat />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.accounts_management,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <AccountsManagement />
               </PrivateRoute>
             ),
           },

@@ -28,7 +28,7 @@ const useRefreshToken = () => {
       return response.data.accessToken;
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("isSignedIn");
       }
       throw error;
     }
