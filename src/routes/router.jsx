@@ -25,6 +25,9 @@ const AccountsManagement = lazy(() =>
   import("../pages/admin/accounts-management/AccountsManagement")
 );
 const Chat = lazy(() => import("../pages/chat/Chat"));
+const AppointmentsManagement = lazy(() =>
+  import("../pages/admin/appointments-management/AppointmentsManagement")
+);
 
 //Sale pages
 
@@ -103,6 +106,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
                 <AccountsManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.appointments_management,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <AppointmentsManagement />
               </PrivateRoute>
             ),
           },

@@ -10,7 +10,7 @@ import ChatRoundedIcon from "@mui/icons-material/ChatRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
-import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import { useNavigate, useLocation } from "react-router-dom";
 import paths from "../../../../routes/paths";
@@ -18,6 +18,11 @@ import paths from "../../../../routes/paths";
 const mainListItems = [
   { text: "Dashboard", icon: <HomeRoundedIcon />, to: paths.dashboard },
   { text: "Chat", icon: <ChatRoundedIcon />, to: paths.admin_chat },
+  {
+    text: "Appointments",
+    icon: <EventNoteRoundedIcon />,
+    to: paths.appointments_management,
+  },
   {
     text: "Accounts",
     icon: <PeopleRoundedIcon />,

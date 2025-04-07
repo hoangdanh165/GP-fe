@@ -17,6 +17,7 @@ export default {
   dashboard: `${rootPaths.adminRoot}/dashboard`,
   admin_chat: `${rootPaths.adminRoot}/chat`,
   accounts_management: `${rootPaths.adminRoot}/manage/accounts`,
+  appointments_management: `${rootPaths.adminRoot}/manage/appointments`,
   handle_feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
 
   // Customer paths
