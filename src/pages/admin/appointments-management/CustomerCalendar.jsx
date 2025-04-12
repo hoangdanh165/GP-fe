@@ -12,6 +12,7 @@ import { Box, Typography } from "@mui/material";
 import useShowSnackbar from "./../../../hooks/useShowSnackbar";
 import useAxiosPrivate from "./../../../hooks/useAxiosPrivate";
 import AppointmentDialog from "./AppointmentDialog";
+import useNotification from "../../../hooks/useNotification";
 const locales = {
   en: enUS,
 };
@@ -27,7 +28,7 @@ const localizer = dateFnsLocalizer({
 const CustomerCalendar = () => {
   const axiosPrivate = useAxiosPrivate();
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
-
+  const { sendNotification } = useNotification();
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -42,7 +43,7 @@ const CustomerCalendar = () => {
         const data = response.data.map((event) => ({
           id: event.id,
           start: new Date(event.date),
-          end: new Date(event.estimated_end_time),
+          end: new Date(event.vehicle_ready_time),
           title: event.title,
           note: event.note,
         }));
@@ -71,10 +72,11 @@ const CustomerCalendar = () => {
   }, [axiosPrivate]);
 
   const handleSelectSlot = ({ start, end }) => {
-    const title = prompt("Nhập tiêu đề lịch hẹn:");
-    if (title) {
-      setEvents([...events, { start, end, title }]);
-    }
+    sendNotification({
+      // user_id: "05529d78-ce43-44e8-9e54-2e5fbd27da2f",
+      roles: "admin,sale",
+      message: "HELLO ADMINs",
+    });
   };
 
   const handleSelectEvent = async (event) => {
@@ -95,22 +97,16 @@ const CustomerCalendar = () => {
     }
   };
 
-  const handleAddService = async () => {};
-
-  const onRemoveService = (serviceId) => {};
-
-  const handleSave = async (data) => {
+  const handleSave = async (formData) => {
+    console.log(formData, selectedEvent.id);
     try {
-      const response = await axiosPrivate.post(
-        `/api/v1/appointments/${selectedEvent.id}/details/`,
-        data
+      const response = await axiosPrivate.put(
+        `/api/v1/appointments/${selectedEvent.id}/update/`,
+        formData
       );
-      setEvents((prevEvents) =>
-        prevEvents.map((event) =>
-          event.id === selectedEvent.id ? { ...event, ...data } : event
-        )
-      );
-      showSnackbar("Appointment updated successfully", "success");
+      if (response.data.detail) {
+        showSnackbar(response.data.detail, "success");
+      }
     } catch (error) {
       console.error("Error saving appointment:", error);
       showSnackbar("Error saving appointment", "error");
@@ -143,8 +139,6 @@ const CustomerCalendar = () => {
         onClose={() => setOpen(false)}
         appoinmentData={appointmentDetails}
         onSave={handleSave}
-        onAddService={handleAddService}
-        onRemoveService={onRemoveService}
         loading={loading}
       />
       <CustomSnackbar />

@@ -38,13 +38,22 @@ const AddServiceDialog = ({ open, onClose, services, onAddServices }) => {
   };
 
   const handleSave = () => {
+    console.log(addedServices);
+    setSelectedCategory("");
+    setSelectedService(null);
     onAddServices(addedServices);
     setAddedServices([]);
     onClose();
   };
 
+  const handleClose = () => {
+    setSelectedCategory("");
+    setSelectedService(null);
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
       <DialogTitle align="center">ADD SERVICES</DialogTitle>
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
@@ -75,7 +84,10 @@ const AddServiceDialog = ({ open, onClose, services, onAddServices }) => {
               const service = filteredServices.find(
                 (s) => s.id === e.target.value
               );
-              setSelectedService(service);
+              if (service && !addedServices.some((s) => s.id === service.id)) {
+                setAddedServices((prev) => [...prev, service]);
+                setSelectedService(service);
+              }
             }}
             label="Service"
           >
@@ -87,15 +99,16 @@ const AddServiceDialog = ({ open, onClose, services, onAddServices }) => {
           </Select>
         </FormControl>
 
-        <Button
-          onClick={handleAddService}
-          variant="outlined"
-          disabled={!selectedService}
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          gap={1}
+          p={1}
+          mt={1}
+          border="1px solid"
+          borderColor="divider"
+          borderRadius={1}
         >
-          Add Service
-        </Button>
-
-        <Box display="flex" flexWrap="wrap" gap={1}>
           {addedServices.map((service) => (
             <Chip
               key={service.id}
@@ -111,7 +124,7 @@ const AddServiceDialog = ({ open, onClose, services, onAddServices }) => {
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
+        <Button onClick={handleSave} color="primary">
           Save
         </Button>
       </DialogActions>

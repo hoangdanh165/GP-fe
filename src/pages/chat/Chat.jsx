@@ -233,6 +233,29 @@ export default function ChatUI() {
             </Stack>
           ))}
 
+        {!loadingConversations && filteredConversations.length === 0 && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "70%",
+            }}
+          >
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              textAlign="center"
+              sx={{
+                fontSize: { xs: "0.5rem", sm: "1rem", md: "1.2rem" },
+                fontWeight: "bold",
+              }}
+            >
+              No conversations yet.
+            </Typography>
+          </Box>
+        )}
+
         {/* Conversations List */}
         {!loadingConversations &&
           filteredConversations.map((conv) => {
