@@ -5,8 +5,6 @@ import { useRecoilState } from "recoil";
 import { notificationsAtom } from "./../atoms/notificationsAtom";
 
 const NOTIFICATION_API = "api/v1/notifications/";
-const SEND_NOTIFICATION_API = "api/v1/notifications/";
-const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
 
 const useNotification = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -59,25 +57,6 @@ const useNotification = () => {
     }
   }, [page, hasMore]);
 
-  const sendNotification = useCallback(
-    async ({ message, params, create_url, extra_data, user_id, roles }) => {
-      try {
-        await axios.post(`${NODE_JS_HOST}/api/v1/notifications`, {
-          user_id: user_id,
-          roles,
-          message,
-          params,
-          create_url,
-          extra_data,
-        });
-      } catch (err) {
-        console.error("Failed to send notification:", err);
-        setError("Failed to send notification.");
-      }
-    },
-    []
-  );
-
   return {
     notifications,
     setNotifications,
@@ -87,7 +66,6 @@ const useNotification = () => {
     loading,
     loadingMore,
     error,
-    sendNotification,
   };
 };
 

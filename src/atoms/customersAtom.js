@@ -1,12 +1,12 @@
 import { atom } from "recoil";
 
-export const servicesAtom = atom({
-  key: "servicesAtom",
+export const customersAtom = atom({
+  key: "customersAtom",
   default: [],
 });
 
-export const selectedServiceAtom = atom({
-  key: "selectedServiceAtom",
+export const selectedCustomerAtom = atom({
+  key: "selectedConversationAtom",
   default: {
     _id: "",
     userId: "",

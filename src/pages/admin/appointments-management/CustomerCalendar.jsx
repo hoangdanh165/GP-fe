@@ -2,17 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { useRecoilState } from "recoil";
 import { servicesAtom } from "../../../atoms/servicesAtom";
+import { customersAtom } from "../../../atoms/customersAtom";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { enUS, se } from "date-fns/locale";
+import { ca, enUS, se } from "date-fns/locale";
 import { Box, Typography } from "@mui/material";
+import AddAppointmentDialog from "./AddAppointmentDialog";
 import useShowSnackbar from "./../../../hooks/useShowSnackbar";
 import useAxiosPrivate from "./../../../hooks/useAxiosPrivate";
 import AppointmentDialog from "./AppointmentDialog";
-import useNotification from "../../../hooks/useNotification";
+import useSendNotification from "../../../hooks/useSendNotification";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
 const locales = {
   en: enUS,
 };
@@ -28,13 +37,16 @@ const localizer = dateFnsLocalizer({
 const CustomerCalendar = () => {
   const axiosPrivate = useAxiosPrivate();
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
-  const { sendNotification } = useNotification();
+  const { sendNotification } = useSendNotification();
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [open, setOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState(null);
   const [services, setServices] = useRecoilState(servicesAtom);
+  const [customers, setCustomers] = useRecoilState(customersAtom);
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -71,11 +83,27 @@ const CustomerCalendar = () => {
     fetchServices();
   }, [axiosPrivate]);
 
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await axiosPrivate.get("/api/v1/users/get-customers/");
+        setCustomers(response.data);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        showSnackbar("Error fetching services", "error");
+      }
+    };
+    fetchCustomers();
+  }, [axiosPrivate]);
+
   const handleSelectSlot = ({ start, end }) => {
+    // setSelectedDate(dayjs(start).toDate());
+    // setAddDialogOpen(true);
     sendNotification({
-      // user_id: "05529d78-ce43-44e8-9e54-2e5fbd27da2f",
-      roles: "admin,sale",
-      message: "HELLO ADMINs",
+      user_id: "05529d78-ce43-44e8-9e54-2e5fbd27da2f",
+      params: { time: "2025-04-02 00:00:00+07:00" },
+      type: "WEB",
+      reminder_type: "APPOINTMENT_REMINDER_1_HOUR",
     });
   };
 
@@ -97,8 +125,62 @@ const CustomerCalendar = () => {
     }
   };
 
-  const handleSave = async (formData) => {
+  const handleSaveAdd = async (formData) => {
+    setLoading(true);
+    console.log(formData);
+    if (
+      !formData.date ||
+      !formData.title ||
+      !formData.customer ||
+      !formData.vehicle_information ||
+      !formData.appointment_services?.length ||
+      !formData.status ||
+      !formData.total_price ||
+      !formData.vehicle_ready_time
+    ) {
+      showSnackbar("Please fill all neccessary fields!", "warning");
+      setLoading(false);
+      throw new Error("Missing required fields");
+    }
+    try {
+      const response = await axiosPrivate.post(
+        "/api/v1/appointments/",
+        formData
+      );
+      if (response.data) {
+        const newEvent = {
+          id: response.data?.id,
+          start: new Date(formData.date),
+          end: new Date(formData.vehicle_ready_time),
+          title: formData.title,
+        };
+        setEvents((prevEvents) => [...prevEvents, newEvent]);
+      }
+      showSnackbar("Appointment added successfully", "success");
+    } catch (error) {
+      console.error("Error adding appointment:", error);
+      showSnackbar("Error adding appointment", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveUpdate = async (formData) => {
+    setLoading(true);
     console.log(formData, selectedEvent.id);
+    if (
+      !formData.date ||
+      !formData.customer ||
+      !formData.vehicle_information ||
+      !formData.appointment_services?.length ||
+      !formData.status ||
+      !formData.total_price ||
+      !formData.vehicle_ready_time
+    ) {
+      showSnackbar("Please fill all neccessary fields!", "warning");
+      setLoading(false);
+      throw new Error("Missing required fields");
+    }
     try {
       const response = await axiosPrivate.put(
         `/api/v1/appointments/${selectedEvent.id}/update/`,
@@ -106,12 +188,25 @@ const CustomerCalendar = () => {
       );
       if (response.data.detail) {
         showSnackbar(response.data.detail, "success");
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id === selectedEvent.id
+              ? {
+                  ...event,
+                  start: new Date(formData.date),
+                  end: new Date(formData.vehicle_ready_time),
+                  title: response.data.data.title,
+                }
+              : event
+          )
+        );
+        setOpen(false);
       }
     } catch (error) {
       console.error("Error saving appointment:", error);
       showSnackbar("Error saving appointment", "error");
     } finally {
-      setOpen(false);
+      setLoading(false);
     }
   };
 
@@ -138,7 +233,14 @@ const CustomerCalendar = () => {
         open={open}
         onClose={() => setOpen(false)}
         appoinmentData={appointmentDetails}
-        onSave={handleSave}
+        onSave={handleSaveUpdate}
+        loading={loading}
+      />
+      <AddAppointmentDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        selectedDate={selectedDate}
+        onSave={handleSaveAdd}
         loading={loading}
       />
       <CustomSnackbar />

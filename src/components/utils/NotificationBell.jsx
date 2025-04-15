@@ -47,7 +47,7 @@ export default function NotificationBell() {
   useEffect(() => {
     socket.on("newNotification", (notificationData) => {
       setNotifications((prev) => [notificationData, ...prev]);
-
+      showSnackbar("You have a new notification", "info");
       const sound = new Audio(messageSound);
       sound.play();
     });
