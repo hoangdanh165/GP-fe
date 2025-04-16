@@ -12,7 +12,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 
 import MenuButton from "./MenuButton";
-import useLogout from "../../../../hooks/useLogout";
+import useLogout from "../../../hooks/useLogout";
 
 const MenuItem = styled(MuiMenuItem)({
   margin: "2px 0",

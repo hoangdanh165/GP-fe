@@ -1,9 +1,9 @@
-import { ReactElement } from 'react';
-import { Link, Stack, Button, Typography } from '@mui/material';
-import Image from '../../components/base/Image';
-import errorSvg from '../../assets/images/error/error.svg';
-import paths from '../../routes/paths';
-import React from 'react';
+import { ReactElement } from "react";
+import { Link, Stack, Button, Typography } from "@mui/material";
+import Image from "../../components/base/Image";
+import errorSvg from "../../assets/images/error/error.svg";
+import paths from "../../routes/paths";
+import React from "react";
 
 const NotFound = (): ReactElement => {
   return (
@@ -32,13 +32,18 @@ const NotFound = (): ReactElement => {
         alt="Not Found Image"
         src={errorSvg}
         sx={{
-          mx: 'auto',
+          mx: "auto",
           height: 260,
           my: { xs: 5, sm: 10 },
           width: { xs: 1, sm: 340 },
         }}
       />
-      <Button href={ paths.login } size="large" variant="contained" component={Link}>
+      <Button
+        href={paths.sign_in}
+        size="large"
+        variant="contained"
+        component={Link}
+      >
         Go back
       </Button>
     </Stack>

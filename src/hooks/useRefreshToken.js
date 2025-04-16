@@ -22,6 +22,8 @@ const useRefreshToken = () => {
           status: response.data.status,
           fullName: response.data.fullName,
           email: response.data.email,
+          address: response.data.address,
+          phone: response.data.phone,
           userId: response.data.userId,
         };
       });

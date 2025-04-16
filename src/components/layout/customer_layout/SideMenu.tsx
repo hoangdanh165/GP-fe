@@ -9,7 +9,8 @@ import Typography from "@mui/material/Typography";
 
 import MenuContent from "./MenuContent";
 import OptionsMenu from "./OptionsMenu";
-import useAuth from "../../../../hooks/useAuth";
+
+import useAuth from "./../../../hooks/useAuth";
 
 const drawerWidth = 240;
 

@@ -7,6 +7,7 @@ const App = lazy(() => import("../App"));
 
 // Layouts
 const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
+const CustomerLayout = lazy(() => import("../layouts/CustomerLayout"));
 
 // Auth pages
 const SignIn = lazy(() => import("../pages/auth/sign-in/SignIn"));
@@ -24,12 +25,19 @@ const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
 const AccountsManagement = lazy(() =>
   import("../pages/admin/accounts-management/AccountsManagement")
 );
-const Chat = lazy(() => import("../pages/chat/Chat"));
 const AppointmentsManagement = lazy(() =>
   import("../pages/admin/appointments-management/AppointmentsManagement")
 );
 
-//Sale pages
+// Customer pages
+const ProfileManagement = lazy(() =>
+  import("../pages/customer/profile-management/ProfileManagement")
+);
+
+// Sale pages
+
+// General pages
+const Chat = lazy(() => import("../pages/chat/Chat"));
 
 // Other components
 import PrivateRoute from "../components/utils/PrivateRoute";
@@ -48,9 +56,11 @@ const createMainLayoutAdminRoutes = () => (
 );
 
 const createMainLayoutCustomerRoutes = () => (
-  <Suspense fallback={<PageLoader />}>
-    <Outlet />
-  </Suspense>
+  <CustomerLayout>
+    <Suspense fallback={<PageLoader />}>
+      <Outlet />
+    </Suspense>
+  </CustomerLayout>
 );
 
 const createMainLayoutSaleRoutes = () => (
@@ -125,14 +135,22 @@ const routes = [
           <PersistSignin>{createMainLayoutCustomerRoutes()}</PersistSignin>
         ),
         children: [
-          // {
-          //   path: paths.profile,
-          //   element: (
-          //     <PrivateRoute allowedRoles={["coach"]}>
-          //     <UserProfile />
-          //   </PrivateRoute>
-          //   )
-          // },
+          {
+            path: paths.customer_chat,
+            element: (
+              <PrivateRoute allowedRoles={["customer"]}>
+                <Chat />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.customer_profile,
+            element: (
+              <PrivateRoute allowedRoles={["customer"]}>
+                <ProfileManagement />
+              </PrivateRoute>
+            ),
+          },
         ],
       },
       {
@@ -142,7 +160,7 @@ const routes = [
           // {
           //   path: paths.profile,
           //   element: (
-          //     <PrivateRoute allowedRoles={["coach"]}>
+          //     <PrivateRoute allowedRoles={["sale"]}>
           //     <UserProfile />
           //   </PrivateRoute>
           //   )
@@ -165,9 +183,9 @@ const routes = [
           {
             path: paths.sign_up,
             element: (
-              // <IsSignedIn>
-              <SignUp />
-              // </IsSignedIn>
+              <IsSignedIn>
+                <SignUp />
+              </IsSignedIn>
             ),
           },
           // {

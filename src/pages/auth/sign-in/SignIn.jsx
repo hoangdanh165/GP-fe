@@ -120,8 +120,10 @@ const SignIn = (props) => {
       const status = response?.data?.status;
       const avatar = response?.data?.avatar;
       const fullName = response?.data?.fullName;
+      const address = response?.data?.address;
+      const phone = response?.data?.phone;
 
-      setAuth({ email, role, status, accessToken, avatar, fullName });
+      setAuth({ email, role, status, accessToken, avatar, fullName, address, phone });
 
       navigate("/");
     } catch (err) {

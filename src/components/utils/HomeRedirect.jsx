@@ -5,7 +5,7 @@ import paths from "../../routes/paths";
 
 const HomeRedirect = () => {
   const { auth } = useAuth();
-  
+
   useEffect(() => {
     if (!auth?.role) {
       return;
@@ -14,14 +14,14 @@ const HomeRedirect = () => {
 
   if (auth) {
     if (auth.role === "customer") {
-      return <Navigate to={paths.accounts} />;
+      return <Navigate to={paths.customer_profile} />;
     } else if (auth.role === "admin") {
       return <Navigate to={paths.dashboard} />;
     } else if (auth.role === "sale") {
       return <Navigate to={paths.sale_contracts} />;
-    } 
+    }
   }
-  return <Navigate to="/auth/sign-in" replace/>;
+  return <Navigate to="/auth/sign-in" replace />;
 };
 
 export default HomeRedirect;

@@ -21,8 +21,9 @@ export default {
   handle_feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
 
   // Customer paths
-  abc: `${rootPaths.customerRoot}/dashboard`,
   customer_chat: `${rootPaths.customerRoot}/chat`,
+  customer_profile: `${rootPaths.customerRoot}/profile`,
+  faq: `${rootPaths.customerRoot}/faq`,
   // Sale paths
 
   // Error paths

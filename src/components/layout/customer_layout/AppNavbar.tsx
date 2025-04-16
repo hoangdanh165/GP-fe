@@ -11,7 +11,7 @@ import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 
 import SideMenuMobile from "./SideMenuMobile";
 import MenuButton from "./MenuButton";
-import ColorModeIconDropdown from "../../../../themes/shared-theme/ColorModeIconDropdown";
+import ColorModeIconDropdown from "../../../themes/shared-theme/ColorModeIconDropdown";
 
 const Toolbar = styled(MuiToolbar)({
   width: "100%",
