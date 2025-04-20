@@ -48,7 +48,13 @@ const AppointmentDialog = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [services, setServices] = useRecoilState(servicesAtom);
 
-  const statusOptions = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELED"];
+  const statusOptions = [
+    "PENDING",
+    "CONFIRMED",
+    "COMPLETED",
+    "CANCELED",
+    "PROCESSING",
+  ];
   const [currentStatus, setCurrentStatus] = useState("PENDING");
 
   const statusColors = {
@@ -56,7 +62,9 @@ const AppointmentDialog = ({
     CONFIRMED: "info",
     COMPLETED: "success",
     CANCELED: "error",
+    PROCESSING: "info",
   };
+
   const handleStatusCycle = () => {
     const currentIndex = statusOptions.indexOf(currentStatus);
     const nextIndex = (currentIndex + 1) % statusOptions.length;

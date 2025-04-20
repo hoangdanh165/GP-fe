@@ -45,63 +45,6 @@ const MessageContainer = () => {
   isOnline = onlineUsers.includes(selectedConversation.userId);
 
   useEffect(() => {
-    socket.on("newMessage", (message) => {
-      if (selectedConversation._id === message.conversation) {
-        setMessages((prev) => [...prev, message]);
-      }
-
-      if (!document.hasFocus()) {
-        const sound = new Audio(messageSound);
-        sound.play();
-      }
-
-      setConversations((prev) => {
-        const updatedConversations = prev.map((conversation) => {
-          if (conversation.id === message.conversation) {
-            return {
-              ...conversation,
-              last_message: message.message,
-              last_sender: message.sender,
-            };
-          }
-          return conversation;
-        });
-        return updatedConversations;
-      });
-    });
-
-    return () => socket.off("newMessage");
-  }, [socket, selectedConversation, setConversations]);
-
-  useEffect(() => {
-    const lastMessageIsFromOtherUser =
-      messages.length && messages[messages.length - 1].sender !== auth.userId;
-    if (lastMessageIsFromOtherUser) {
-      socket.emit("markMessagesAsSeen", {
-        conversationId: selectedConversation._id,
-        userId: selectedConversation.userId,
-      });
-    }
-
-    socket.on("messagesSeen", ({ conversationId }) => {
-      if (selectedConversation._id === conversationId) {
-        setMessages((prev) => {
-          const updatedMessages = prev.map((message) => {
-            if (!message.seen) {
-              return {
-                ...message,
-                seen: true,
-              };
-            }
-            return message;
-          });
-          return updatedMessages;
-        });
-      }
-    });
-  }, [socket, auth.userId, messages, selectedConversation]);
-
-  useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -132,7 +75,7 @@ const MessageContainer = () => {
     <Stack
       flex={70}
       sx={{
-        bgcolor: theme.palette.mode === "dark" ? "#2a2b34" : "#f0f0f0",
+        bgcolor: theme.palette.mode === "dark" ? "#2a2b34" : "#fcfcfcs",
         borderRadius: 2,
         pl: 2,
         pr: 2,
@@ -141,41 +84,6 @@ const MessageContainer = () => {
       }}
       direction="column"
     >
-      {/* Message header */}
-      <Stack
-        direction="row"
-        alignItems="center"
-        spacing={2}
-        sx={{ height: 60 }}
-      >
-        <Box sx={{ position: "relative", display: "inline-block" }}>
-          <Avatar
-            src={selectedConversation.userProfilePic}
-            sx={{ width: 40, height: 40 }}
-          />
-          {isOnline && (
-            <Box
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                width: 10,
-                height: 10,
-                borderRadius: "50%",
-                backgroundColor: "#00FF00",
-                border: `1.5px solid ${borderColor}`,
-              }}
-            />
-          )}
-        </Box>
-
-        <Typography variant="body1" fontWeight="bold">
-          {selectedConversation.username}
-        </Typography>
-      </Stack>
-
-      <Divider />
-
       <Box sx={{ flex: 1, overflowY: "auto", pb: 2, pr: 0.5, pl: 0.5, pt: 2 }}>
         {/* Loading Skeletons */}
         {loadingMessages &&
@@ -195,7 +103,7 @@ const MessageContainer = () => {
             >
               {i % 2 === 0 && (
                 <Skeleton variant="circular" width={28} height={28} />
-              )}
+              )}  
               {i % 2 === 0 && (
                 <Stack spacing={1} sx={{ width: "100%" }}>
                   <Skeleton variant="rounded" width="50%" height={15} />
@@ -222,28 +130,7 @@ const MessageContainer = () => {
           ))}
 
         {/* Messages */}
-        {!loadingMessages && messages.length === 0 && (
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <Typography
-              variant="body2"
-              color="textSecondary"
-              textAlign="center"
-              sx={{
-                fontSize: { xs: "1rem", sm: "1.2rem", md: "1.4rem" },
-                fontWeight: "bold",
-              }}
-            >
-              Text something to start this conversation.
-            </Typography>
-          </Box>
-        )}
+
         {!loadingMessages &&
           messages.length > 0 &&
           messages.map((message, index) => (

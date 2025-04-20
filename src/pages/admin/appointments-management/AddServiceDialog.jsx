@@ -58,7 +58,7 @@ const AddServiceDialog = ({ open, onClose, services, onAddServices }) => {
       <DialogContent
         sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
       >
-        <FormControl fullWidth>
+        <FormControl fullWidth sx={{ mt: 2, mb: 2 }}>
           <InputLabel>Category</InputLabel>
           <Select
             value={selectedCategory}

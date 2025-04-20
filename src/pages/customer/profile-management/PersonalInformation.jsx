@@ -99,8 +99,17 @@ export default function Profile() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper elevation={3} sx={{ p: 4, maxWidth: 600, mx: "auto" }}>
+    <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          width: "100%",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Typography variant="h5" mb={2} textAlign="left">
           Personal Information
         </Typography>
@@ -119,18 +128,7 @@ export default function Profile() {
             sx={{ width: 100, height: 100, mb: 2 }}
           />
           {isEditing && (
-            <IconButton
-              component="label"
-              // sx={{
-              //   position: "absolute",
-              //   bottom: 0,
-              //   right: 0,
-              //   backgroundColor: "transparent",
-              //   border: "1px solid #ccc",
-              //   boxShadow: 1,
-              //   "&:hover": { backgroundColor: "#eee" },
-              // }}
-            >
+            <IconButton component="label">
               <EditIcon fontSize="small" />
               <input
                 hidden

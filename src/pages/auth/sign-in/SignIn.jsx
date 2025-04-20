@@ -23,6 +23,7 @@ import axios from "../../../services/axios";
 import useAuth from "../../../hooks/useAuth";
 import GoogleButton from "../../../components/auth/GoogleButton";
 import SnackbarNotification from "../../../components/utils/SnackbarNotification";
+import { CircularProgress, useTheme } from "@mui/material";
 
 const SIGN_IN_API = import.meta.env.VITE_SIGN_IN_API;
 const SIGN_UP_URL = import.meta.env.VITE_SIGN_UP_URL;
@@ -71,10 +72,12 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 const SignIn = (props) => {
   const navigate = useNavigate();
+  const theme = useTheme();
   const { setAuth, persist, setPersist } = useAuth();
 
   const [errMsg, setErrMsg] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
@@ -100,6 +103,7 @@ const SignIn = (props) => {
     if (!validateInputs()) {
       return;
     }
+    setLoading(true);
     const data = new FormData(event.currentTarget);
     let email, password;
     email = data.get("email");
@@ -123,7 +127,16 @@ const SignIn = (props) => {
       const address = response?.data?.address;
       const phone = response?.data?.phone;
 
-      setAuth({ email, role, status, accessToken, avatar, fullName, address, phone });
+      setAuth({
+        email,
+        role,
+        status,
+        accessToken,
+        avatar,
+        fullName,
+        address,
+        phone,
+      });
 
       navigate("/");
     } catch (err) {
@@ -140,6 +153,8 @@ const SignIn = (props) => {
         setErrMsg("Sign in failed!");
       }
       setSnackbarOpen(true);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -239,8 +254,30 @@ const SignIn = (props) => {
               fullWidth
               variant="contained"
               onClick={validateInputs}
+              disabled={loading}
+              color="primary"
             >
-              Sign in
+              {loading ? (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="center"
+                  spacing={1}
+                >
+                  <CircularProgress size={20} color="primary" />
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: theme.palette.primary.contrastText,
+                      fontWeight: 500,
+                    }}
+                  >
+                    Signing in...
+                  </Typography>
+                </Stack>
+              ) : (
+                "Sign in"
+              )}
             </Button>
             <Link
               component="button"
