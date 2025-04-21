@@ -12,37 +12,26 @@ import {
 import Message from "./Message";
 import MessageInput from "./MessageInput";
 import { useEffect, useRef, useState } from "react";
-
-import {
-  conversationsAtom,
-  selectedConversationAtom,
-} from "../../atoms/messagesAtom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { useSocket } from "../../contexts/SocketContext";
+import { useRecoilState } from "recoil";
+import { chatbotHistoryAtom } from "../../atoms/chatbotHistoryAtom";
 import messageSound from "../../assets/sounds/message.mp3";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import useShowSnackbar from "../../hooks/useShowSnackbar";
+import { v4 as uuidv4 } from "uuid";
 
 const MessageContainer = () => {
   const theme = useTheme();
-  const borderColor = theme.palette.mode === "dark" ? "#333" : "#FFF";
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
 
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
-  const { socket, onlineUsers } = useSocket();
-  let isOnline;
 
-  const selectedConversation = useRecoilValue(selectedConversationAtom);
-
+  const [botIsThinking, setBotIsThinking] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useRecoilState(chatbotHistoryAtom);
 
-  const setConversations = useSetRecoilState(conversationsAtom);
   const messageEndRef = useRef(null);
-
-  isOnline = onlineUsers.includes(selectedConversation.userId);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,25 +40,32 @@ const MessageContainer = () => {
   useEffect(() => {
     const getMessages = async () => {
       setMessages([]);
-      if (!selectedConversation.firstCreated) {
-        setLoadingMessages(true);
-        try {
-          const res = await axiosPrivate.get(
-            `/api/v1/messages/by-conversation/${selectedConversation._id}`
-          );
 
+      setLoadingMessages(true);
+      try {
+        const res = await axiosPrivate.get(`/api/v1/chatbot/history/`);
+        if (res.data.length === 0) {
+          setMessages([
+            {
+              id: uuidv4(),
+              message:
+                "Hello there, welcome to Prestige Auto Garage! How can I assist you today?",
+              is_bot: true,
+            },
+          ]);
+        } else {
           setMessages(res.data);
-        } catch (error) {
-          console.log(error.message || "Unidentified error!");
-          showSnackbar(error.message, "info");
-        } finally {
-          setLoadingMessages(false);
         }
+      } catch (error) {
+        console.log(error.message || "Unidentified error!");
+        showSnackbar(error.message, "error");
+      } finally {
+        setLoadingMessages(false);
       }
     };
 
     getMessages();
-  }, [selectedConversation._id, selectedConversation.firstCreated]);
+  }, []);
 
   return (
     <Stack
@@ -84,7 +80,7 @@ const MessageContainer = () => {
       }}
       direction="column"
     >
-      <Box sx={{ flex: 1, overflowY: "auto", pb: 2, pr: 0.5, pl: 0.5, pt: 2 }}>
+      <Box sx={{ flex: 1, overflowY: "auto", pb: 2, pt: 2 }}>
         {/* Loading Skeletons */}
         {loadingMessages &&
           [...Array(5)].map((_, i) => (
@@ -103,7 +99,7 @@ const MessageContainer = () => {
             >
               {i % 2 === 0 && (
                 <Skeleton variant="circular" width={28} height={28} />
-              )}  
+              )}
               {i % 2 === 0 && (
                 <Stack spacing={1} sx={{ width: "100%" }}>
                   <Skeleton variant="rounded" width="50%" height={15} />
@@ -144,14 +140,27 @@ const MessageContainer = () => {
             >
               <Message
                 message={message}
-                ownMessage={auth.userId === message.sender}
+                ownMessage={!message.is_bot}
                 isLastMessage={index === messages.length - 1}
               />
             </Box>
           ))}
+        {botIsThinking && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ fontStyle: "italic", textAlign: "center", mb: 1 }}
+          >
+            Chatbot is thinking...
+          </Typography>
+        )}
       </Box>
-
-      <MessageInput setMessages={setMessages} />
+      <Box sx={{ mt: 1 }}>
+        <MessageInput
+          setMessages={setMessages}
+          setBotIsThinking={setBotIsThinking}
+        />
+      </Box>
       <CustomSnackbar />
     </Stack>
   );

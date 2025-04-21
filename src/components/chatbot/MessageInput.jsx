@@ -10,82 +10,56 @@ import {
   CircularProgress,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-
-import {
-  conversationsAtom,
-  selectedConversationAtom,
-} from "../../atoms/messagesAtom";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import usePreviewImg from "../../hooks/usePreviewImg";
 import { useRef, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAuth from "../../hooks/useAuth";
 import useShowSnackbar from "../../hooks/useShowSnackbar";
+import { v4 as uuidv4 } from "uuid";
 
-const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
-
-const MessageInput = ({ setMessages }) => {
+const MessageInput = ({ setMessages, setBotIsThinking }) => {
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
 
   const [messageText, setMessageText] = useState("");
-  const selectedConversation = useRecoilValue(selectedConversationAtom);
-  const setConversations = useSetRecoilState(conversationsAtom);
-  const imageRef = useRef(null);
-  const { handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
   const [isSending, setIsSending] = useState(false);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
-    if (!messageText && !imgUrl) return;
+    if (!messageText.trim() && !imgUrl) return;
     if (isSending) return;
 
+    if (messageText.length > 500) {
+      showSnackbar("Message is too long!", "error");
+      return;
+    }
+    const userMessage = {
+      id: uuidv4(),
+      message: messageText,
+      is_bot: false,
+    };
     setIsSending(true);
+    setBotIsThinking(true);
+
+    setMessageText("");
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
-      const res = await fetch(`${NODE_JS_HOST}/api/v1/messages`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sender: auth.userId,
-          message: messageText,
-          receiver: selectedConversation?.userId,
-          conversation: selectedConversation?._id,
-        }),
+      const res = await axiosPrivate.post("/api/v1/chatbot/ask/", {
+        id: uuidv4(),
+        message: messageText,
+        user: auth.userId,
+        is_bot: false,
       });
 
-      if (!res.ok)
-        throw new Error(`Server error: ${res.status} ${res.statusText}`);
-
-      const data = await res.json();
-
-      setMessages((prevMessages) => [...prevMessages, data]);
-
-      setConversations((prevConvs) => {
-        const updatedConversations = prevConvs.map((conversation) => {
-          if (conversation.id === selectedConversation._id) {
-            return {
-              ...conversation,
-              last_message: data.message,
-              last_sender: data.sender,
-            };
-          }
-          return conversation;
-        });
-        return updatedConversations;
-      });
-
-      setMessageText("");
-      setImgUrl("");
+      setMessages((prevMessages) => [...prevMessages, res.data]);
     } catch (error) {
       console.error("Error sending message: ", error.message);
       showSnackbar(error.message, "error");
     } finally {
       setIsSending(false);
+      setBotIsThinking(false);
     }
   };
 
@@ -100,6 +74,8 @@ const MessageInput = ({ setMessages }) => {
         <TextField
           fullWidth
           variant="outlined"
+          size="small"
+          disabled={isSending}
           placeholder="Type a message..."
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
@@ -124,31 +100,6 @@ const MessageInput = ({ setMessages }) => {
       >
         <SendIcon />
       </IconButton>
-
-      <Dialog
-        open={Boolean(imgUrl)}
-        onClose={() => setImgUrl("")}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Preview Image</DialogTitle>
-        <DialogContent>
-          <Box
-            component="img"
-            src={imgUrl}
-            sx={{ width: "100%", borderRadius: 1 }}
-          />
-        </DialogContent>
-        <DialogActions>
-          {!isSending ? (
-            <IconButton onClick={handleSendMessage}>
-              <SendIcon />
-            </IconButton>
-          ) : (
-            <CircularProgress size={24} />
-          )}
-        </DialogActions>
-      </Dialog>
 
       <CustomSnackbar />
     </Stack>

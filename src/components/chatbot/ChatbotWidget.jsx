@@ -18,7 +18,7 @@ const ChatbotWidget = ({ currentUser }) => {
     "/unauthorized",
     "/forbidden",
     "/banned",
-    "*", // not-found
+    "*",
   ];
 
   const shouldHide = hiddenPaths.some((path) =>
@@ -48,7 +48,6 @@ const ChatbotWidget = ({ currentUser }) => {
         </IconButton>
       )}
 
-      {/* Cửa sổ Chat */}
       {open && (
         <Paper
           elevation={8}
@@ -91,7 +90,16 @@ const ChatbotWidget = ({ currentUser }) => {
             </IconButton>
           </Box>
 
-          <Box sx={{ flexGrow: 1, p: 1, bgcolor: "#f9f9f9" }}>
+          <Box
+            sx={{
+              flexGrow: 1,
+              p: 0.1,
+              bgcolor: "#f9f9f9",
+              overflowY: "auto",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <MessageContainer />
           </Box>
         </Paper>

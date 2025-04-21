@@ -1,14 +1,8 @@
 import { Avatar, Box, Typography, Skeleton, IconButton } from "@mui/material";
-import { useRecoilValue } from "recoil";
 import { useState } from "react";
-import CheckIcon from "@mui/icons-material/Check";
-import DoneAllIcon from "@mui/icons-material/DoneAll";
-import { BsCheck2All } from "react-icons/bs";
 import chatbotAvatar from "../../assets/chatbot/avatar.png";
 
-const Message = ({ ownMessage, message, isLastMessage }) => {
-  const [imgLoaded, setImgLoaded] = useState(false);
-
+const Message = ({ ownMessage, message }) => {
   return (
     <Box
       display="flex"
@@ -39,11 +33,11 @@ const Message = ({ ownMessage, message, isLastMessage }) => {
               color: ownMessage ? "black" : "white",
               padding: "7px",
               borderRadius: "10px",
-              maxWidth: "350px",
+              maxWidth: "180px",
               display: "flex",
               alignItems: "center",
-              mb: 0.1,
-              mt: 0.1,
+              mb: 0.5,
+              mt: 0.5,
               wordWrap: "break-word",
             }}
           >
@@ -51,55 +45,12 @@ const Message = ({ ownMessage, message, isLastMessage }) => {
               sx={{
                 maxWidth: "100%",
                 wordBreak: "break-word",
+                fontSize: "0.8rem",
               }}
             >
               {message.message}
             </Typography>
           </Box>
-          {ownMessage && isLastMessage && (
-            <Box
-              sx={{
-                alignSelf: "flex-end",
-                mt: 0.5,
-                mr: 0,
-                color: message.seen ? "blue" : "",
-                fontWeight: "bold",
-              }}
-            >
-              <BsCheck2All size={16} />
-            </Box>
-          )}
-        </Box>
-      )}
-
-      {/* Image Message */}
-      {message.img && (
-        <Box sx={{ position: "relative", width: 200, marginTop: 1 }}>
-          {!imgLoaded && (
-            <Skeleton variant="rectangular" width={200} height={200} />
-          )}
-          <img
-            src={message.img}
-            alt="Message"
-            style={{
-              width: "200px",
-              borderRadius: "4px",
-              display: imgLoaded ? "block" : "none",
-            }}
-            onLoad={() => setImgLoaded(true)}
-          />
-          {ownMessage && imgLoaded && (
-            <IconButton
-              sx={{
-                position: "absolute",
-                bottom: 5,
-                right: 5,
-                color: message.seen ? "blue" : "inherit",
-              }}
-            >
-              {message.seen ? <DoneAllIcon /> : <CheckIcon />}
-            </IconButton>
-          )}
         </Box>
       )}
     </Box>
