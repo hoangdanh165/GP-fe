@@ -1,8 +1,14 @@
-import { Avatar, Box, Typography, Skeleton, IconButton } from "@mui/material";
-import { useState } from "react";
+import { Avatar, Box } from "@mui/material";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import chatbotAvatar from "../../assets/chatbot/avatar.png";
 
 const Message = ({ ownMessage, message }) => {
+  const createMarkup = (text) => {
+    const rawMarkup = marked(text || "", { breaks: true });
+    return { __html: DOMPurify.sanitize(rawMarkup) };
+  };
+
   return (
     <Box
       display="flex"
@@ -39,17 +45,14 @@ const Message = ({ ownMessage, message }) => {
               mb: 0.5,
               mt: 0.5,
               wordWrap: "break-word",
+              fontSize: "0.8rem",
+              lineHeight: 1.4,
             }}
           >
-            <Typography
-              sx={{
-                maxWidth: "100%",
-                wordBreak: "break-word",
-                fontSize: "0.8rem",
-              }}
-            >
-              {message.message}
-            </Typography>
+            <div
+              dangerouslySetInnerHTML={createMarkup(message.message)}
+              style={{ wordBreak: "break-word" }}
+            />
           </Box>
         </Box>
       )}

@@ -46,7 +46,7 @@ const MessageInput = ({ setMessages, setBotIsThinking }) => {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
-      const res = await axiosPrivate.post("/api/v1/chatbot/ask/", {
+      const res = await axiosPrivate.post("/api/v1/chatbot/ask-gemini/", {
         id: uuidv4(),
         message: messageText,
         user: auth.userId,
