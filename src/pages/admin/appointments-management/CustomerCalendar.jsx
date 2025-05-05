@@ -188,6 +188,7 @@ const CustomerCalendar = () => {
       );
       if (response.data.detail) {
         showSnackbar(response.data.detail, "success");
+
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
             event.id === selectedEvent.id
@@ -201,6 +202,14 @@ const CustomerCalendar = () => {
           )
         );
         setOpen(false);
+      }
+
+      if (formData.status === "completed") {
+        await axiosPrivate.post(`/api/v1/appointments/create-reminder/`, {
+          id: selectedEvent.id,
+          reminder_type: "VEHICLE_READY_REMINDER",
+          vehicle_ready_time: formData.vehicle_ready_time,
+        });
       }
     } catch (error) {
       console.error("Error saving appointment:", error);

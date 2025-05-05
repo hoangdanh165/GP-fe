@@ -18,12 +18,15 @@ import {
   IconButton,
   Stack,
   useTheme,
+  Checkbox,
   Divider,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import LoadingOverlay from "../../../components/loading/LoadingOverlay";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+
 import AddServiceDialog from "./AddServiceDialog";
 import useShowSnackbar from "../../../hooks/useShowSnackbar";
 import dayjs from "dayjs";
@@ -66,10 +69,32 @@ const AppointmentDialog = ({
   };
 
   const handleStatusCycle = () => {
-    const currentIndex = statusOptions.indexOf(currentStatus);
-    const nextIndex = (currentIndex + 1) % statusOptions.length;
-    setCurrentStatus(statusOptions[nextIndex]);
+    if (currentStatus === "COMPLETED") return;
+
+    const cycleStatus = statusOptions.filter((s) => s !== "COMPLETED");
+
+    const currentIndex = cycleStatus.indexOf(currentStatus);
+    const nextIndex = (currentIndex + 1) % cycleStatus.length;
+
+    setCurrentStatus(cycleStatus[nextIndex]);
   };
+
+  useEffect(() => {
+    const services = formData.appointment_services || [];
+
+    if (services.length === 0) return;
+
+    const allCompleted = services.every((s) => s.completed);
+    const anyCompleted = services.some((s) => s.completed);
+
+    if (allCompleted) {
+      setCurrentStatus("COMPLETED");
+    } else if (anyCompleted) {
+      setCurrentStatus("PROCESSING");
+    } else {
+      setCurrentStatus("PENDING");
+    }
+  }, [formData.appointment_services]);
 
   useEffect(() => {
     if (appoinmentData) {
@@ -319,6 +344,7 @@ const AppointmentDialog = ({
       appointment_services: formData.appointment_services.map((item) => ({
         service: item.service.id,
         price: item.price,
+        completed: item.completed || false,
       })),
       total_price: totalPrice.toFixed(2),
       vehicle_ready_time: vehicle_ready_time || null,
@@ -512,10 +538,27 @@ const AppointmentDialog = ({
                           gap: 0.5,
                           justifyContent: "flex-start",
                           pl: 2,
+                          mr: 2,
                         }}
                       >
                         <AccessTimeIcon fontSize="small" />
                         <Typography>{s.service.estimated_duration}</Typography>
+                        <Checkbox
+                          size="small"
+                          checked={s.completed || false}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setFormData((prev) => ({
+                              ...prev,
+                              appointment_services:
+                                prev.appointment_services.map((item) =>
+                                  item.id === s.id
+                                    ? { ...item, completed: checked }
+                                    : item
+                                ),
+                            }));
+                          }}
+                        />
                       </Box>
 
                       <Box sx={{ width: 40, textAlign: "right" }}>
@@ -591,13 +634,45 @@ const AppointmentDialog = ({
                     </Box>
                   </Typography>
                 </Stack>
-
-                <Button
-                  startIcon={<AddIcon />}
-                  onClick={() => setIsDialogOpen(true)}
-                >
-                  Add Service
-                </Button>
+                <Stack spacing={1}>
+                  <Box
+                    alignItems={"flex-end"}
+                    display={"flex"}
+                    flexDirection={"column"}
+                    width={"200px"}
+                  >
+                    {formData.appointment_services?.length > 0 && (
+                      <Button
+                        startIcon={<DoneAllIcon />}
+                        onClick={() => {
+                          const allCompleted =
+                            formData.appointment_services.every(
+                              (s) => s.completed
+                            );
+                          setFormData((prev) => ({
+                            ...prev,
+                            appointment_services: prev.appointment_services.map(
+                              (s) => ({
+                                ...s,
+                                completed: !allCompleted,
+                              })
+                            ),
+                          }));
+                        }}
+                      >
+                        {formData.appointment_services.every((s) => s.completed)
+                          ? "Undo"
+                          : "Mark All As Completed"}
+                      </Button>
+                    )}
+                    <Button
+                      startIcon={<AddIcon />}
+                      onClick={() => setIsDialogOpen(true)}
+                    >
+                      Add Service
+                    </Button>
+                  </Box>
+                </Stack>
               </Box>
               <Box
                 mt={2}
