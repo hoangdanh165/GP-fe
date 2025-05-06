@@ -18,7 +18,7 @@ import useSendNotification from "../../../hooks/useSendNotification";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-
+import axios from "axios";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -33,6 +33,7 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
+const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
 
 const CustomerCalendar = () => {
   const axiosPrivate = useAxiosPrivate();
@@ -97,14 +98,14 @@ const CustomerCalendar = () => {
   }, [axiosPrivate]);
 
   const handleSelectSlot = ({ start, end }) => {
-    // setSelectedDate(dayjs(start).toDate());
-    // setAddDialogOpen(true);
-    sendNotification({
-      user_id: "05529d78-ce43-44e8-9e54-2e5fbd27da2f",
-      params: { time: "2025-04-02 00:00:00+07:00" },
-      type: "WEB",
-      reminder_type: "APPOINTMENT_REMINDER_1_HOUR",
-    });
+    setSelectedDate(dayjs(start).toDate());
+    setAddDialogOpen(true);
+    // sendNotification({
+    //   user_id: "05529d78-ce43-44e8-9e54-2e5fbd27da2f",
+    //   params: { time: "2025-04-02 00:00:00+07:00" },
+    //   type: "WEB",
+    //   reminder_type: "APPOINTMENT_REMINDER_1_HOUR",
+    // });
   };
 
   const handleSelectEvent = async (event) => {
@@ -210,6 +211,13 @@ const CustomerCalendar = () => {
           reminder_type: "VEHICLE_READY_REMINDER",
           vehicle_ready_time: formData.vehicle_ready_time,
         });
+      }
+
+      try {
+        await axios.post(`${NODE_JS_HOST}/api/v1/appointments`, { formData });
+        console.log("Gửi sang Node thành công!");
+      } catch (nodeError) {
+        console.error("Gửi sang Node thất bại:", nodeError);
       }
     } catch (error) {
       console.error("Error saving appointment:", error);

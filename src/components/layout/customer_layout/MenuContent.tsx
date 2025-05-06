@@ -21,7 +21,7 @@ const mainListItems = [
   {
     text: "Appointments History",
     icon: <EventNoteRoundedIcon />,
-    to: paths.appointments_management,
+    to: paths.appointments_history,
   },
   {
     text: "Accounts",

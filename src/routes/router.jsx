@@ -33,7 +33,9 @@ const AppointmentsManagement = lazy(() =>
 const ProfileManagement = lazy(() =>
   import("../pages/customer/profile-management/ProfileManagement")
 );
-
+const AppointmentsHistory = lazy(() =>
+  import("../pages/customer/appoinment-history/AppointmentsHistory")
+);
 // Sale pages
 
 // General pages
@@ -148,6 +150,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["customer"]}>
                 <ProfileManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.appointments_history,
+            element: (
+              <PrivateRoute allowedRoles={["customer"]}>
+                <AppointmentsHistory />
               </PrivateRoute>
             ),
           },

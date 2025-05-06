@@ -23,6 +23,8 @@ export default {
   // Customer paths
   customer_chat: `${rootPaths.customerRoot}/chat`,
   customer_profile: `${rootPaths.customerRoot}/profile`,
+  appointments_history: `${rootPaths.customerRoot}/appointments-history`,
+
   faq: `${rootPaths.customerRoot}/faq`,
   // Sale paths
 
