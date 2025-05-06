@@ -40,12 +40,13 @@ const AppointmentsList = () => {
   useEffect(() => {
     socket.on("newUpdatesOfAppoinment", (formData) => {
       if (formData && formData.id) {
+        console.log(formData);
         setAppointments((prevAppointments) =>
           prevAppointments.map((appointment) =>
             appointment.id === formData.id ? formData : appointment
           )
         );
-        console.log("✅ Cập nhật appointment từ WebSocket:", formData.id);
+        console.log("Cập nhật appointment từ WebSocket:", formData.id);
       }
     });
 
@@ -53,7 +54,7 @@ const AppointmentsList = () => {
       socket.off("newUpdatesOfAppoinment");
     };
   }, [socket]);
-  
+
   const calculateProgress = (services) => {
     const total = services.length;
     const completed = services.filter((s) => s.completed).length;
@@ -108,7 +109,7 @@ const AppointmentsList = () => {
                       <Typography variant="body2" gutterBottom>
                         Vehicle Ready Time:{" "}
                         <strong>{`${new Date(
-                          item.date
+                          item.vehicle_ready_time
                         ).toLocaleString()}`}</strong>
                       </Typography>
 
@@ -119,7 +120,7 @@ const AppointmentsList = () => {
                         <ul style={{ marginTop: 0 }}>
                           {item.appointment_services.map((svc) => (
                             <li key={svc.id}>
-                              {svc.service.name}{" "}
+                              {(svc.service?.name || svc.service_name) + " "}
                               {svc.completed
                                 ? "(Completed ✅)"
                                 : "(Processing ⏳)"}

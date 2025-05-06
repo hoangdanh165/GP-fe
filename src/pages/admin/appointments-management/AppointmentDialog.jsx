@@ -344,6 +344,7 @@ const AppointmentDialog = ({
       appointment_services: formData.appointment_services.map((item) => ({
         service: item.service.id,
         price: item.price,
+        service_name: item.service.name,
         completed: item.completed || false,
       })),
       total_price: totalPrice.toFixed(2),
