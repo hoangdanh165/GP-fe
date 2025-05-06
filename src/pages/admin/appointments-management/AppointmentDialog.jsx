@@ -54,29 +54,31 @@ const AppointmentDialog = ({
   const statusOptions = [
     "PENDING",
     "CONFIRMED",
+    "PROCESSING",
     "COMPLETED",
     "CANCELED",
-    "PROCESSING",
   ];
   const [currentStatus, setCurrentStatus] = useState("PENDING");
 
   const statusColors = {
     PENDING: "warning",
     CONFIRMED: "info",
+    PROCESSING: "info",
     COMPLETED: "success",
     CANCELED: "error",
-    PROCESSING: "info",
   };
 
   const handleStatusCycle = () => {
-    if (currentStatus === "COMPLETED") return;
+    if (formData.status.toUpperCase() === "COMPLETED") return;
 
     const cycleStatus = statusOptions.filter((s) => s !== "COMPLETED");
-
-    const currentIndex = cycleStatus.indexOf(currentStatus);
+    const currentIndex = cycleStatus.indexOf(formData.status.toUpperCase());
     const nextIndex = (currentIndex + 1) % cycleStatus.length;
 
-    setCurrentStatus(cycleStatus[nextIndex]);
+    setFormData((prev) => ({
+      ...prev,
+      status: cycleStatus[nextIndex].toLowerCase(), // vì status lưu trong DB là lowercase
+    }));
   };
 
   useEffect(() => {
@@ -98,6 +100,7 @@ const AppointmentDialog = ({
 
   useEffect(() => {
     if (appoinmentData) {
+      setCurrentStatus(appoinmentData.status.toUpperCase());
       setFormData(appoinmentData);
     }
   }, [appoinmentData]);
@@ -108,6 +111,7 @@ const AppointmentDialog = ({
       vehicle_information: {},
       appointment_services: [],
       date: null,
+      status: "PENDING",
       create_at: null,
       update_at: null,
     });
@@ -340,7 +344,7 @@ const AppointmentDialog = ({
     const payload = {
       ...formData,
       customer: formData.customer?.id,
-      status: currentStatus.toLowerCase(),
+      status: formData.status,
       appointment_services: formData.appointment_services.map((item) => ({
         service: item.service.id,
         price: item.price,
@@ -544,22 +548,24 @@ const AppointmentDialog = ({
                       >
                         <AccessTimeIcon fontSize="small" />
                         <Typography>{s.service.estimated_duration}</Typography>
-                        <Checkbox
-                          size="small"
-                          checked={s.completed || false}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            setFormData((prev) => ({
-                              ...prev,
-                              appointment_services:
-                                prev.appointment_services.map((item) =>
-                                  item.id === s.id
-                                    ? { ...item, completed: checked }
-                                    : item
-                                ),
-                            }));
-                          }}
-                        />
+                        {formData?.status?.toUpperCase?.() === "PROCESSING" && (
+                          <Checkbox
+                            size="small"
+                            checked={s.completed || false}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setFormData((prev) => ({
+                                ...prev,
+                                appointment_services:
+                                  prev.appointment_services.map((item) =>
+                                    item.id === s.id
+                                      ? { ...item, completed: checked }
+                                      : item
+                                  ),
+                              }));
+                            }}
+                          />
+                        )}
                       </Box>
 
                       <Box sx={{ width: 40, textAlign: "right" }}>
@@ -642,30 +648,32 @@ const AppointmentDialog = ({
                     flexDirection={"column"}
                     width={"200px"}
                   >
-                    {formData.appointment_services?.length > 0 && (
-                      <Button
-                        startIcon={<DoneAllIcon />}
-                        onClick={() => {
-                          const allCompleted =
-                            formData.appointment_services.every(
-                              (s) => s.completed
-                            );
-                          setFormData((prev) => ({
-                            ...prev,
-                            appointment_services: prev.appointment_services.map(
-                              (s) => ({
-                                ...s,
-                                completed: !allCompleted,
-                              })
-                            ),
-                          }));
-                        }}
-                      >
-                        {formData.appointment_services.every((s) => s.completed)
-                          ? "Undo"
-                          : "Mark All As Completed"}
-                      </Button>
-                    )}
+                    {formData?.status?.toUpperCase?.() === "PROCESSING" &&
+                      formData.appointment_services?.length > 0 && (
+                        <Button
+                          startIcon={<DoneAllIcon />}
+                          onClick={() => {
+                            const allCompleted =
+                              formData.appointment_services.every(
+                                (s) => s.completed
+                              );
+                            setFormData((prev) => ({
+                              ...prev,
+                              appointment_services:
+                                prev.appointment_services.map((s) => ({
+                                  ...s,
+                                  completed: !allCompleted,
+                                })),
+                            }));
+                          }}
+                        >
+                          {formData.appointment_services.every(
+                            (s) => s.completed
+                          )
+                            ? "Undo"
+                            : "Mark All As Completed"}
+                        </Button>
+                      )}
                     <Button
                       startIcon={<AddIcon />}
                       onClick={() => setIsDialogOpen(true)}
@@ -719,12 +727,13 @@ const AppointmentDialog = ({
       >
         <Button
           variant="contained"
-          color={statusColors[currentStatus]}
+          color={statusColors[formData.status?.toUpperCase?.() || "PENDING"]}
           onClick={handleStatusCycle}
           sx={{ width: 150, fontWeight: "bold", color: "white" }}
         >
-          {currentStatus}
+          {formData.status?.toUpperCase?.()}
         </Button>
+
         <Box>
           <Button onClick={captureDialog} variant="outlined" color="primary">
             Export as Image

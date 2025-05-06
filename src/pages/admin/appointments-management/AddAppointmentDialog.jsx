@@ -60,7 +60,11 @@ const AddAppointmentDialog = ({
   const [vehicleInputs, setVehicleInputs] = useState([{ key: "", value: "" }]);
   const [loadingCustomer, setLoadingCustomer] = useState(false);
 
-  const statusOptions = ["PENDING", "CONFIRMED", "COMPLETED", "CANCELED"];
+  const statusOptions = [
+    "PENDING",
+    "CONFIRMED",
+    // , "COMPLETED", "CANCELED"
+  ];
   const [currentStatus, setCurrentStatus] = useState("PENDING");
 
   const handleCustomerChange = async (event) => {
@@ -125,8 +129,8 @@ const AddAppointmentDialog = ({
   const statusColors = {
     PENDING: "warning",
     CONFIRMED: "info",
-    COMPLETED: "success",
-    CANCELED: "error",
+    // COMPLETED: "success",
+    // CANCELED: "error",
   };
 
   const handleStatusCycle = () => {
@@ -395,7 +399,7 @@ const AddAppointmentDialog = ({
     };
     try {
       await onSave(payload);
-      handleClose(); 
+      handleClose();
     } catch (error) {
       console.error("Error in handleSave:", error);
       showSnackbar("Failed to save appointment", "error");
