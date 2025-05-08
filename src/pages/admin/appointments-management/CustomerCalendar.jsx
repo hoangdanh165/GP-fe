@@ -19,6 +19,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import axios from "axios";
+import { useSocket } from "../../../contexts/SocketContext";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -48,6 +49,7 @@ const CustomerCalendar = () => {
   const [services, setServices] = useRecoilState(servicesAtom);
   const [customers, setCustomers] = useRecoilState(customersAtom);
   const [selectedDate, setSelectedDate] = useState(null);
+  const { socket } = useSocket();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -226,6 +228,28 @@ const CustomerCalendar = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    socket.on("newAppoinment", (formData) => {
+      if (formData && formData.id) {
+        console.log(formData);
+        setEvents((prevEvents) => [
+          ...prevEvents,
+          {
+            id: formData.id,
+            title: formData.title,
+            start: new Date(formData.date),
+            end: new Date(formData.vehicle_ready_time),
+          },
+        ]);
+        console.log("Added appointment from WebSocket:", formData.id);
+      }
+    });
+
+    return () => {
+      socket.off("newAppoinment");
+    };
+  }, [socket]);
 
   return (
     <Box

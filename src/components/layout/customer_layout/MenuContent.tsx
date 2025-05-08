@@ -13,6 +13,7 @@ import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useNavigate, useLocation } from "react-router-dom";
 import paths from "../../../routes/paths";
 const mainListItems = [
@@ -24,9 +25,9 @@ const mainListItems = [
     to: paths.appointments_history,
   },
   {
-    text: "Accounts",
-    icon: <PeopleRoundedIcon />,
-    to: paths.accounts_management,
+    text: "Book your appointment",
+    icon: <AccessTimeIcon />,
+    to: paths.book_your_appointment,
   },
   { text: "Tasks", icon: <AssignmentRoundedIcon />, to: "/tasks" },
 ];

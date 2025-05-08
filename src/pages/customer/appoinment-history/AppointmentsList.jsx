@@ -98,7 +98,8 @@ const AppointmentsList = () => {
                         Vehicle:{" "}
                         <strong>{item.vehicle_information?.name}</strong> -{" "}
                         <strong>
-                          {item.vehicle_information?.license_plate_number}
+                          {item.vehicle_information?.license_plate_number ||
+                            item.vehicle_information?.license_plate}
                         </strong>
                       </Typography>
 

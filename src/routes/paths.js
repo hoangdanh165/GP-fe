@@ -24,6 +24,7 @@ export default {
   customer_chat: `${rootPaths.customerRoot}/chat`,
   customer_profile: `${rootPaths.customerRoot}/profile`,
   appointments_history: `${rootPaths.customerRoot}/appointments-history`,
+  book_your_appointment: `${rootPaths.customerRoot}/book-your-appointment`,
 
   faq: `${rootPaths.customerRoot}/faq`,
   // Sale paths
