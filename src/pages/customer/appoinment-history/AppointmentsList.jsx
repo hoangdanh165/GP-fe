@@ -7,12 +7,21 @@ import {
   CircularProgress,
   Paper,
   Box,
+  Chip,
   LinearProgress,
   Divider,
   Stack,
 } from "@mui/material";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import { useSocket } from "../../../contexts/SocketContext";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import UpdateIcon from "@mui/icons-material/Update";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const AppointmentsList = () => {
   const [appointments, setAppointments] = useState([]);
@@ -77,11 +86,16 @@ const AppointmentsList = () => {
     );
   }
 
+  const statusColors = {
+    PENDING: "warning",
+    CONFIRMED: "info",
+    PROCESSING: "info",
+    COMPLETED: "success",
+    CANCELED: "error",
+  };
+
   return (
     <Box p={3}>
-      <Typography variant="h4" gutterBottom>
-        Appointment History
-      </Typography>
       <List>
         {appointments.map((item) => {
           const progress = calculateProgress(item.appointment_services);
@@ -89,45 +103,106 @@ const AppointmentsList = () => {
             <Paper key={item.id} elevation={3} sx={{ mb: 2, p: 2 }}>
               <ListItem alignItems="flex-start">
                 <ListItemText
-                  primary={`Appointment on ${new Date(
-                    item.date
-                  ).toLocaleString()}`}
+                  primary={
+                    <Box
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
+                    >
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: "bold !important" }}
+                        >
+                          Appointment on {new Date(item.date).toLocaleString()}{" "}
+                          for {item.vehicle_information?.name} -{" "}
+                          {item.vehicle_information?.license_plate_number ||
+                            item.vehicle_information?.license_plate}{" "}
+                          {dayjs()
+                            .tz("Asia/Ho_Chi_Minh")
+                            .diff(
+                              dayjs(item.create_at).tz("Asia/Ho_Chi_Minh"),
+                              "minute"
+                            ) < 5 && (
+                            <Chip
+                              label="Recently added"
+                              color="success"
+                              size="small"
+                              variant="outlined"
+                            />
+                          )}
+                        </Typography>
+                      </Box>
+
+                      <Chip
+                        label={item.status.toUpperCase()}
+                        color={
+                          statusColors[item.status.toUpperCase()] || "default"
+                        }
+                        size="medium"
+                        variant="filled"
+                        sx={{ verticalAlign: "middle" }}
+                      />
+                    </Box>
+                  }
                   secondary={
                     <Box mt={1}>
                       <Typography variant="body2" gutterBottom>
-                        Vehicle:{" "}
-                        <strong>{item.vehicle_information?.name}</strong> -{" "}
-                        <strong>
-                          {item.vehicle_information?.license_plate_number ||
-                            item.vehicle_information?.license_plate}
-                        </strong>
-                      </Typography>
-
-                      <Typography variant="body2" gutterBottom>
-                        Status: <strong>{item.status}</strong>
-                      </Typography>
-
-                      <Typography variant="body2" gutterBottom>
                         Vehicle Ready Time:{" "}
-                        <strong>{`${new Date(
-                          item.vehicle_ready_time
-                        ).toLocaleString()}`}</strong>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontWeight: "bold !important" }}
+                        >
+                          {item.vehicle_ready_time
+                            ? new Date(item.vehicle_ready_time).toLocaleString()
+                            : "N/A"}
+                        </Typography>
                       </Typography>
 
                       <Box mt={1}>
                         <Typography variant="body2" gutterBottom>
                           Services:
                         </Typography>
-                        <ul style={{ marginTop: 0 }}>
+                        <List disablePadding>
                           {item.appointment_services.map((svc) => (
-                            <li key={svc.id}>
-                              {(svc.service?.name || svc.service_name) + " "}
-                              {svc.completed
-                                ? "(Completed ✅)"
-                                : "(Processing ⏳)"}
-                            </li>
+                            <ListItem key={svc.id} disablePadding>
+                              <ListItemText
+                                primary={
+                                  <Box
+                                    display="flex"
+                                    alignItems="center"
+                                    gap={1}
+                                  >
+                                    <Typography variant="body2">
+                                      - {svc.service?.name || svc.service_name}
+                                    </Typography>
+                                    <Chip
+                                      label={
+                                        svc.completed
+                                          ? "Completed"
+                                          : "Processing"
+                                      }
+                                      color={svc.completed ? "success" : "info"}
+                                      size="small"
+                                      variant="filled"
+                                    />
+                                  </Box>
+                                }
+                              />
+                            </ListItem>
                           ))}
-                        </ul>
+                        </List>
+                        <Typography variant="body2" gutterBottom>
+                          Total:{" "}
+                          <Typography
+                            component="span"
+                            variant="body2"
+                            sx={{ fontWeight: "bold !important" }}
+                          >
+                            {item.total_price}
+                          </Typography>
+                        </Typography>
                       </Box>
 
                       <Box mt={2}>
@@ -150,6 +225,26 @@ const AppointmentsList = () => {
                           </Typography>
                         </Stack>
                       </Box>
+                      <Stack direction="row" spacing={1} mt={1}>
+                        <Chip
+                          label={`${new Date(
+                            item.create_at
+                          ).toLocaleTimeString()}`}
+                          color="info"
+                          size="small"
+                          icon={<AccessTimeIcon />}
+                          variant="outlined"
+                        />
+                        <Chip
+                          label={`${new Date(
+                            item.update_at
+                          ).toLocaleTimeString()}`}
+                          color="warning"
+                          size="small"
+                          icon={<UpdateIcon />}
+                          variant="outlined"
+                        />
+                      </Stack>
                     </Box>
                   }
                 />

@@ -215,8 +215,16 @@ const CustomerCalendar = () => {
         });
       }
 
+      const updatedFormData = {
+        ...formData,
+        create_at: response.data.data.create_at,
+        update_at: response.data.data.update_at,
+      };
+
       try {
-        await axios.post(`${NODE_JS_HOST}/api/v1/appointments`, { formData });
+        await axios.post(`${NODE_JS_HOST}/api/v1/appointments`, {
+          formData: updatedFormData,
+        });
         console.log("Gửi sang Node thành công!");
       } catch (nodeError) {
         console.error("Gửi sang Node thất bại:", nodeError);
