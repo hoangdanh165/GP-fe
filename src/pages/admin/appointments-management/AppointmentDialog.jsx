@@ -348,10 +348,13 @@ const AppointmentDialog = ({
   const handleSave = async () => {
     const { doneTime } = estimatedTotalTime || {};
     const vehicle_ready_time = formatToVNTime(doneTime);
+    const allServicesCompleted = formData.appointment_services.every(
+      (item) => item.completed === true
+    );
     const payload = {
       ...formData,
       customer: formData.customer?.id,
-      status: formData.status,
+      status: allServicesCompleted ? "completed" : formData.status,
       appointment_services: formData.appointment_services.map((item) => ({
         service: item.service.id,
         price: item.price,
@@ -370,281 +373,59 @@ const AppointmentDialog = ({
     }
   };
 
-  const handleCreatePayment = async () => {
-    setInvoiceData({
-      id: "36721b3f-4448-449a-a4a1-72ef27f7ecd4",
-      invoice_id: "PAG000002",
-      appointment: {
-        id: "f704f299-5c8d-4c1e-9723-a92f0228074a",
-        date: "2025-05-15 17:02:00+07:00",
-        vehicle_ready_time: "2025-05-16T10:32:00+07:00",
-        status: "canceled",
-        customer: {
-          id: "6aeb4985-de56-4523-975a-e37587c319c8",
-          full_name: "Hoang Danh",
-          email: "kienos.gym@gmail.com",
-          phone: "08625156",
-          address:
-            "255 Nam Cao, Phường Hoà Khánh Nam, quận Liên Chiểu, thành phố Đà Nẵng",
-          status: 1,
-          email_verified: false,
-          avatar:
-            "https://storage.googleapis.com/prestige-auto-bucket/media/avatars/grok.png",
-        },
-        total_price: "176.39",
-        note: null,
-        vehicle_information: {
-          vin: "TBJSXC1A2GUYUA391",
-          name: "Kia Cerato",
-          year: 2024,
-          brand: "Kia",
-          color: "Xám",
-          engine_type: "Điện",
-          license_plate: "33T 385.59",
-          current_odometer: 96137,
-          registration_province: "Hà Nội",
-        },
-        additional_customer_information: null,
-        appointment_services: [
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "08929f32-01fb-40b8-be67-995ea33855fc",
-            service: {
-              id: "66bd7196-addf-4833-9bcb-c4fd4124a892",
-              name: "Pre-purchase Inspection",
-              category: {
-                id: "0e1d5c3b-cc7f-4685-a84d-b3d79d0d4ec0",
-                name: "Inspection",
-              },
-              price: "74.69",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "74.69",
-            completed: false,
-          },
-          {
-            id: "870637fb-3d3b-424f-8684-db250eee0f03",
-            service: {
-              id: "00379c2f-d5d6-4318-860e-7e1a8fbea609",
-              name: "Oil Change",
-              category: {
-                id: "241bd85d-747d-4022-bbcc-daa7875e01b4",
-                name: "Maintenance",
-              },
-              price: "58.46",
-              discount: "30.00",
-              discount_from: "2025-04-25T08:00:18.415279+07:00",
-              discount_to: "2025-04-28T17:00:18.415279+07:00",
-              estimated_duration: "01:00:00",
-            },
-            price: "58.46",
-            completed: false,
-          },
-          {
-            id: "d200cbd4-27f5-4704-a2a9-dc8e174e4d0c",
-            service: {
-              id: "c98be385-e010-4fc2-88ea-7cd8abf614d2",
-              name: "Timing Belt Replacement",
-              category: {
-                id: "241bd85d-747d-4022-bbcc-daa7875e01b4",
-                name: "Maintenance",
-              },
-              price: "43.24",
-              discount: "0.00",
-              discount_from: null,
-              discount_to: null,
-              estimated_duration: "01:00:00",
-            },
-            price: "43.24",
-            completed: false,
-          },
-        ],
-        create_at: "2025-05-08 17:02:13.807770+07:00",
-        update_at: "2025-05-08 17:06:28.411615+07:00",
-      },
-      method: "cash",
-      status: "pending",
-      amount: "500000.00",
-      transaction_id: null,
-      paid_at: null,
-      qr_code_url:
-        "https://img.vietqr.io/image/VCB-0123456789-basic.png?amount=500000&addInfo=PAG000001&accountName=Prestige%20Garage",
-      note: null,
-      create_at: "2025-05-09T21:31:09.934236+07:00",
-      update_at: "2025-05-09T21:31:09.979049+07:00",
-    });
+  const handleCreateInvoice = async () => {
     setInvoiceDialogOpen(true);
-    // setLoadingCreateInvoice(true);
-    // try {
-    //   const response = await axiosPrivate.post(
-    //     "/api/v1/payments/create-invoice/",
-    //     {
-    //       appointment: appoinmentData.id,
-    //       method: "cash",
-    //       amount: "500000",
-    //     }
-    //   );
+    setLoadingCreateInvoice(true);
+    try {
+      const response = await axiosPrivate.post(
+        "/api/v1/payments/create-invoice/",
+        {
+          appointment: appoinmentData.id,
+          method: "cash",
+          amount: appoinmentData.total_price,
+        }
+      );
+      setFormData((prev) => ({
+        ...prev,
+        invoice_created: true,
+      }));
+      setInvoiceData(response.data.data);
+      setInvoiceDialogOpen(true);
 
-    //   setInvoiceData(response.data.data);
-    //   setInvoiceDialogOpen(true);
+      console.log("Created Payment:", response.data);
+    } catch (err) {
+      console.error("Create payment error:", err);
+    } finally {
+      setLoadingCreateInvoice(false);
+    }
+  };
 
-    //   console.log("Created Payment:", response.data);
-    // } catch (err) {
-    //   console.error("Create payment error:", err);
-    // } finally {
-    //   setLoadingCreateInvoice(false);
-    // }
+  const handleShowInvoice = async () => {
+    setLoadingCreateInvoice(true);
+    try {
+      const response = await axiosPrivate.get(
+        `/api/v1/payments/get-by-appointment/?appointment_id=${appoinmentData.id}`,
+        {
+          appointment_id: appoinmentData.id,
+        }
+      );
+
+      setInvoiceData(response.data.data);
+      setInvoiceDialogOpen(true);
+
+      console.log("Created Payment:", response.data);
+    } catch (err) {
+      console.error("Create payment error:", err);
+    } finally {
+      setLoadingCreateInvoice(false);
+    }
   };
 
   const handleCloseInvoiceDialog = () => {
     setInvoiceDialogOpen(false);
+    setInvoiceData(null);
   };
+
   return (
     <Dialog
       open={open}
@@ -1018,14 +799,32 @@ const AppointmentDialog = ({
         </Button>
 
         <Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleCreatePayment}
-            disabled={loading}
-          >
-            {loading ? <CircularProgress size={24} /> : "Create Invoice"}
-          </Button>
+          {formData?.status?.toUpperCase?.() === "COMPLETED" &&
+            (formData?.invoice_created === false ? (
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleCreateInvoice}
+                disabled={loadingCreateInvoice}
+                sx={{ mr: 2 }}
+              >
+                {loadingCreateInvoice ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  "Create Invoice"
+                )}
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleShowInvoice}
+                sx={{ mr: 2 }}
+              >
+                Show Invoice
+              </Button>
+            ))}
+
           <Button onClick={captureDialog} variant="outlined" color="primary">
             Export as Image
           </Button>

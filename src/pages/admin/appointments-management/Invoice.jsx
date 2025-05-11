@@ -31,8 +31,8 @@ const Invoice = ({ invoiceData, open, onClose }) => {
       <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
         <DialogTitle>Invoice</DialogTitle>
         <DialogContent>
-          <Typography variant="body1" color="error">
-            Error: Invoice data is missing.
+          <Typography variant="body1" color="success">
+            Loading Invoice Data...
           </Typography>
         </DialogContent>
         <DialogActions>
