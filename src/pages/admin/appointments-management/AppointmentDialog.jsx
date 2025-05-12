@@ -389,6 +389,7 @@ const AppointmentDialog = ({
         ...prev,
         invoice_created: true,
       }));
+
       setInvoiceData(response.data.data);
       setInvoiceDialogOpen(true);
 
@@ -818,6 +819,7 @@ const AppointmentDialog = ({
               <Button
                 variant="outlined"
                 color="secondary"
+                disabled={loadingCreateInvoice}
                 onClick={handleShowInvoice}
                 sx={{ mr: 2 }}
               >

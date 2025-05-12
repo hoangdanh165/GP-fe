@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useReactToPrint } from "react-to-print";
 import {
   Box,
@@ -17,37 +17,46 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
+import PaymentQRCode from "./PaymentQRCode";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const Invoice = ({ invoiceData, open, onClose }) => {
   const componentRef = useRef();
+  const [formData, setFormData] = useState({});
+
+  const axiosPrivate = useAxiosPrivate();
+  const [loadingQrCode, setLoadingQrCode] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState(null);
+
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
     contentRef: componentRef,
     documentTitle: `Invoice_${invoiceData?.invoice_id || "N/A"}`,
     onError: (error) => console.error("Print error:", error),
   });
-  if (!invoiceData) {
-    return (
-      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-        <DialogTitle>Invoice</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1" color="success">
-            Loading Invoice Data...
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={onClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
 
-  const { appointment, invoice_id, create_at, qr_code_url } = invoiceData;
-  const customer = appointment?.customer;
-  const vehicle = appointment?.vehicle_information;
-  const appointment_services = appointment?.appointment_services || [];
+  useEffect(() => {
+    if (invoiceData) {
+      setFormData(invoiceData);
+    }
+  }, [invoiceData]);
+
+  const {
+    appointment = {},
+    invoice_id = "N/A",
+    create_at = null,
+  } = formData || {};
+
+  const customer = appointment.customer || {};
+  const vehicle = appointment.vehicle_information || {};
+  const appointment_services = appointment.appointment_services || [];
+
   const formattedDate = create_at
     ? new Date(create_at).toLocaleDateString("en-GB", {
         day: "2-digit",
@@ -55,6 +64,70 @@ const Invoice = ({ invoiceData, open, onClose }) => {
         year: "numeric",
       })
     : "N/A";
+
+  const [cooldown, setCooldown] = useState(0);
+  const COOLDOWN_MINUTES = 15;
+  const appointmentId = appointment?.id;
+  const QR_LOCAL_KEY = `qrCooldownExpiresAt_${appointmentId}`;
+  const QR_URL_KEY = `qrPaymentUrl_${appointmentId}`;
+
+  useEffect(() => {
+    if (!appointmentId) return;
+    const url = localStorage.getItem(QR_URL_KEY);
+
+    const savedExpire = localStorage.getItem(QR_LOCAL_KEY);
+    if (savedExpire) {
+      const diff = dayjs(savedExpire).diff(dayjs(), "second");
+      if (diff > 0) {
+        setCooldown(diff);
+        setPaymentUrl(url);
+        startCooldownCountdown(diff);
+      }
+    }
+  }, [appointmentId]);
+
+  const startCooldownCountdown = (seconds) => {
+    let time = seconds;
+    const interval = setInterval(() => {
+      time -= 1;
+      setCooldown(time);
+      if (time <= 0) {
+        clearInterval(interval);
+        localStorage.removeItem(QR_LOCAL_KEY);
+      }
+    }, 1000);
+  };
+
+  const createPaymentUrl = async () => {
+    setLoadingQrCode(true);
+    console.log(appointment);
+    try {
+      const response = await axiosPrivate.post("/api/v1/payments/create-url/", {
+        order_type: "billpayment",
+        order_id: invoice_id,
+        // amount: appointment.total_price,
+        amount: "200000",
+        order_desc: "Thanh toan hoa don",
+        bank_code: "",
+        language: "vn",
+      });
+
+      const url = response.data.payment_url;
+      setPaymentUrl(url);
+
+      const expireAt = dayjs().add(COOLDOWN_MINUTES, "minute");
+
+      localStorage.setItem(QR_LOCAL_KEY, expireAt.toISOString());
+      localStorage.setItem(QR_URL_KEY, url);
+
+      setCooldown(COOLDOWN_MINUTES * 60);
+      startCooldownCountdown(COOLDOWN_MINUTES * 60);
+    } catch (error) {
+      console.error("Error creating payment URL:", error);
+    } finally {
+      setLoadingQrCode(false);
+    }
+  };
 
   return (
     <Dialog
@@ -94,19 +167,20 @@ const Invoice = ({ invoiceData, open, onClose }) => {
         </style>
         <div ref={componentRef}>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Box sx={{ textAlign: "right" }}>
-              {qr_code_url && (
-                <img
-                  src={qr_code_url}
-                  alt="QR Code"
-                  style={{
-                    width: 300,
-                    height: 300,
-                    border: "1px solid #ccc",
-                    borderRadius: 8,
-                  }}
-                />
-              )}
+            <Box sx={{ textAlign: "left" }}>
+              <PaymentQRCode paymentUrl={paymentUrl} />
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={createPaymentUrl}
+                disabled={loadingQrCode || cooldown > 0}
+              >
+                {cooldown > 0
+                  ? `Wait ${Math.floor(cooldown / 60)}:${(cooldown % 60)
+                      .toString()
+                      .padStart(2, "0")} to re-generate`
+                  : "Generate Payment QR Code"}
+              </Button>
             </Box>
             <Box sx={{ textAlign: "right" }}>
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
