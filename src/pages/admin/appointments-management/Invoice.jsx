@@ -15,6 +15,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Chip,
   Button,
 } from "@mui/material";
 import PaymentQRCode from "./PaymentQRCode";
@@ -22,6 +23,7 @@ import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { useSocket } from "../../../contexts/SocketContext";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -31,6 +33,7 @@ const Invoice = ({ invoiceData, open, onClose }) => {
   const [formData, setFormData] = useState({});
 
   const axiosPrivate = useAxiosPrivate();
+  const { socket } = useSocket();
   const [loadingQrCode, setLoadingQrCode] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState(null);
 
@@ -50,12 +53,29 @@ const Invoice = ({ invoiceData, open, onClose }) => {
   const {
     appointment = {},
     invoice_id = "N/A",
+    status = "N/A",
     create_at = null,
   } = formData || {};
 
   const customer = appointment.customer || {};
   const vehicle = appointment.vehicle_information || {};
   const appointment_services = appointment.appointment_services || [];
+
+  useEffect(() => {
+    socket.on("newUpdatesOfPayment", (formData) => {
+      if (formData && formData.invoice_id === invoice_id) {
+        console.log(formData);
+        setFormData((prevData) => ({
+          ...prevData,
+          status: formData.status || prevData.status,
+        }));
+      }
+    });
+
+    return () => {
+      socket.off("newUpdatesOfPayment");
+    };
+  }, [socket, invoice_id]);
 
   const formattedDate = create_at
     ? new Date(create_at).toLocaleDateString("en-GB", {
@@ -105,8 +125,7 @@ const Invoice = ({ invoiceData, open, onClose }) => {
       const response = await axiosPrivate.post("/api/v1/payments/create-url/", {
         order_type: "billpayment",
         order_id: invoice_id,
-        // amount: appointment.total_price,
-        amount: "200000",
+        amount: appointment.total_price,
         order_desc: "Thanh toan hoa don",
         bank_code: "",
         language: "vn",
@@ -127,6 +146,35 @@ const Invoice = ({ invoiceData, open, onClose }) => {
     } finally {
       setLoadingQrCode(false);
     }
+  };
+
+  const statusMap = {
+    pending: {
+      label: "Pending",
+      color: "warning",
+    },
+    paid: {
+      label: "Paid",
+      color: "success",
+    },
+    failed: {
+      label: "Failed",
+      color: "error",
+    },
+    refunded: {
+      label: "Refunded",
+      color: "info",
+    },
+    canceled: {
+      label: "Canceled",
+      color: "default",
+    },
+  };
+
+  const normalized = status?.toLowerCase?.();
+  const config = statusMap[normalized] || {
+    label: status,
+    color: "default",
   };
 
   return (
@@ -373,6 +421,19 @@ const Invoice = ({ invoiceData, open, onClose }) => {
         </div>
       </DialogContent>
       <DialogActions>
+        <Chip
+          label={config.label}
+          color={config.color}
+          variant="outlined"
+          size="medium"
+          sx={{
+            fontSize: "10rem",
+            padding: "0.1rem 0.5rem",
+            height: "40px",
+            fontWeight: 600,
+            textTransform: "uppercase",
+          }}
+        />
         <Button onClick={handlePrint} color="primary" variant="contained">
           Print Invoice
         </Button>

@@ -54,6 +54,7 @@ export default function Profile() {
       email: auth?.email || "",
     };
     setInitialUserData(userData);
+    console.log("userData", userData);
     setFormData(userData);
   }, [auth]);
 

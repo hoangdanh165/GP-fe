@@ -571,7 +571,7 @@ const AppointmentDialog = ({
                         </Typography>
                       </Box>
 
-                      <Box sx={{ width: 80, textAlign: "left" }}>
+                      <Box sx={{ width: 150, textAlign: "left" }}>
                         {(() => {
                           const priceInfo = getDiscountedPrice(
                             s.service,
@@ -581,7 +581,7 @@ const AppointmentDialog = ({
                           return (
                             <Box>
                               <Typography fontWeight={"bold"}>
-                                ${priceInfo.final}
+                                {priceInfo.final} VNĐ
                               </Typography>
                               {priceInfo.discounted && (
                                 <Typography
@@ -702,7 +702,7 @@ const AppointmentDialog = ({
                   <Typography>
                     Total:{" "}
                     <Box component="span" fontWeight="bold">
-                      ${totalPrice?.toFixed(2)}
+                      {totalPrice?.toFixed(2)} VND
                     </Box>
                   </Typography>
                 </Stack>

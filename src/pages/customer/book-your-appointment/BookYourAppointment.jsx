@@ -60,6 +60,23 @@ const BookYourAppointment = () => {
   });
 
   useEffect(() => {
+    setFormData({
+      name: auth?.fullName || null,
+      phone: auth?.phone || null,
+      email: auth?.email || null,
+      address: auth?.address || null,
+      carInfo: null,
+      vehicle_information: null,
+      date: null,
+      note: null,
+      status: "pending",
+      total_price: null,
+      title: auth?.fullName,
+      pickup_time: null,
+    });
+  }, [auth]);
+
+  useEffect(() => {
     const fetchServices = async () => {
       try {
         const response = await axiosPrivate.get("/api/v1/services/");

@@ -44,6 +44,7 @@ const Index = lazy(() =>
 
 // General pages
 const Chat = lazy(() => import("../pages/chat/Chat"));
+const PaymentResult = lazy(() => import("../pages/payment/PaymentResult"));
 
 // Other components
 import PrivateRoute from "../components/utils/PrivateRoute";
@@ -187,6 +188,16 @@ const routes = [
           //   </PrivateRoute>
           //   )
           // },
+        ],
+      },
+      {
+        path: rootPaths.paymentRoot,
+        element: createAuthLayoutRoutes(),
+        children: [
+          {
+            path: paths.payment_result,
+            element: <PaymentResult />,
+          },
         ],
       },
 
