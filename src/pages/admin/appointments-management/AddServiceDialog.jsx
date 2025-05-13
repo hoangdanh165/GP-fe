@@ -93,7 +93,7 @@ const AddServiceDialog = ({ open, onClose, services, onAddServices }) => {
           >
             {filteredServices.map((service) => (
               <MenuItem key={service.id} value={service.id}>
-                {service.name} - ${service.price}
+                {service.name} - {service.price} VND
               </MenuItem>
             ))}
           </Select>

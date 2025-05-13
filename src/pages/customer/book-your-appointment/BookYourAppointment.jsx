@@ -64,6 +64,7 @@ const BookYourAppointment = () => {
       name: auth?.fullName || null,
       phone: auth?.phone || null,
       email: auth?.email || null,
+      customer: auth?.userId || null,
       address: auth?.address || null,
       carInfo: null,
       vehicle_information: null,
@@ -357,6 +358,15 @@ const BookYourAppointment = () => {
     return { hours, minutes, doneTime };
   })();
 
+  const handleRemoveService = (id) => {
+    setFormData((prev) => ({
+      ...prev,
+      appointment_services: prev.appointment_services.filter(
+        (s) => s.id !== id
+      ),
+    }));
+  };
+
   const getDiscountedPrice = (service, appointmentDate) => {
     const { price, discount, discount_from, discount_to } = service;
 
@@ -431,7 +441,7 @@ const BookYourAppointment = () => {
 
     const payload = {
       ...cleanedFormData,
-      customer: auth?.userId,
+      customer: formData.customer,
       title: auth?.fullName,
       appointment_services: formData.appointment_services.map((item) => ({
         service: item.service.id,
@@ -650,7 +660,7 @@ const BookYourAppointment = () => {
                 <Box sx={{ flexGrow: 1 }}>
                   <Typography fontWeight="bold">{s.service.name}</Typography>
                 </Box>
-                <Box sx={{ width: 80, textAlign: "left" }}>
+                <Box sx={{ width: 150, textAlign: "left" }}>
                   {(() => {
                     const priceInfo = getDiscountedPrice(
                       s.service,
@@ -659,7 +669,7 @@ const BookYourAppointment = () => {
                     return (
                       <Box>
                         <Typography fontWeight="bold">
-                          ${priceInfo.final}
+                          {priceInfo.final} VND
                         </Typography>
                         {priceInfo.discounted && (
                           <Typography
@@ -670,7 +680,7 @@ const BookYourAppointment = () => {
                               fontSize: "0.75rem",
                             }}
                           >
-                            ${priceInfo.original}
+                            {priceInfo.original} VND
                           </Typography>
                         )}
                       </Box>
@@ -735,7 +745,7 @@ const BookYourAppointment = () => {
             <Typography>
               Total:{" "}
               <Box component="span" fontWeight="bold">
-                ${totalPrice?.toFixed(2) || "0"}
+                {totalPrice?.toFixed(2) || "0"} VND
               </Box>
             </Typography>
           </Stack>

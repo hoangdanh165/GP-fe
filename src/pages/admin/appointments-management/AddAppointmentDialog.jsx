@@ -601,7 +601,7 @@ const AddAppointmentDialog = ({
                         {s.service.name}
                       </Typography>
                     </Box>
-                    <Box sx={{ width: 80, textAlign: "left" }}>
+                    <Box sx={{ width: 150, textAlign: "left" }}>
                       {(() => {
                         const priceInfo = getDiscountedPrice(
                           s.service,
@@ -610,7 +610,7 @@ const AddAppointmentDialog = ({
                         return (
                           <Box>
                             <Typography fontWeight="bold">
-                              ${priceInfo.final}
+                              {priceInfo.final} VND
                             </Typography>
                             {priceInfo.discounted && (
                               <Typography
@@ -621,7 +621,7 @@ const AddAppointmentDialog = ({
                                   fontSize: "0.75rem",
                                 }}
                               >
-                                ${priceInfo.original}
+                                {priceInfo.original} VND
                               </Typography>
                             )}
                           </Box>

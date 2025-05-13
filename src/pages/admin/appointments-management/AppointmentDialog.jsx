@@ -581,7 +581,7 @@ const AppointmentDialog = ({
                           return (
                             <Box>
                               <Typography fontWeight={"bold"}>
-                                {priceInfo.final} VNĐ
+                                {priceInfo.final} VND
                               </Typography>
                               {priceInfo.discounted && (
                                 <Typography
@@ -592,7 +592,7 @@ const AppointmentDialog = ({
                                     fontSize: "0.75 rem",
                                   }}
                                 >
-                                  ${priceInfo.original}
+                                  {priceInfo.original} VND
                                 </Typography>
                               )}
                             </Box>
