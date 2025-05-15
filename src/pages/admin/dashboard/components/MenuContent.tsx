@@ -28,7 +28,11 @@ const mainListItems = [
     icon: <PeopleRoundedIcon />,
     to: paths.accounts_management,
   },
-  { text: "Tasks", icon: <AssignmentRoundedIcon />, to: "/tasks" },
+  {
+    text: "Invoices",
+    icon: <EventNoteRoundedIcon />,
+    to: paths.invoice_management_admin,
+  },
 ];
 
 const secondaryListItems = [

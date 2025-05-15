@@ -20,6 +20,7 @@ export default {
   accounts_management: `${rootPaths.adminRoot}/manage/accounts`,
   appointments_management: `${rootPaths.adminRoot}/manage/appointments`,
   handle_feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
+  invoice_management_admin: `${rootPaths.adminRoot}/invoices-management`,
 
   // Customer paths
   customer_chat: `${rootPaths.customerRoot}/chat`,
@@ -29,6 +30,7 @@ export default {
 
   faq: `${rootPaths.customerRoot}/faq`,
   // Sale paths
+  invoice_management_sale: `${rootPaths.saleRoot}/invoice-management`,
 
   // Payment paths
   payment_result: `${rootPaths.paymentRoot}/result`,

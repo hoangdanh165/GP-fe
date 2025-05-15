@@ -28,6 +28,9 @@ const AccountsManagement = lazy(() =>
 const AppointmentsManagement = lazy(() =>
   import("../pages/admin/appointments-management/AppointmentsManagement")
 );
+const InvoicesManagement = lazy(() =>
+  import("../pages/admin/invoices-management/InvoicesManagement")
+);
 
 // Customer pages
 const ProfileManagement = lazy(() =>
@@ -131,6 +134,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
                 <AppointmentsManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.invoice_management_admin,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <InvoicesManagement />
               </PrivateRoute>
             ),
           },
