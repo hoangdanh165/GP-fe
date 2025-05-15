@@ -126,8 +126,10 @@ const SignIn = (props) => {
       const fullName = response?.data?.fullName;
       const address = response?.data?.address;
       const phone = response?.data?.phone;
+      const userId = response?.data?.userId;
 
       setAuth({
+        userId,
         email,
         role,
         status,

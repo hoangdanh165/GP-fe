@@ -17,7 +17,6 @@ import useAuth from "../../../hooks/useAuth";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
@@ -27,6 +26,8 @@ import { servicesAtom } from "../../../atoms/servicesAtom";
 import useShowSnackbar from "../../../hooks/useShowSnackbar";
 import paths from "../../../routes/paths";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+
 import axios from "axios";
 
 dayjs.extend(utc);
@@ -42,7 +43,65 @@ const BookYourAppointment = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [services, setServices] = useRecoilState(servicesAtom);
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
+  const location = useLocation();
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const preferredServices = searchParams.get("preferred-services");
+    const appointmentTimeStr = searchParams.get("appointment-time");
+
+    if (preferredServices && services.length > 0) {
+      const ids = preferredServices.split(",").map((id) => id.trim());
+      const matchedServices = services.filter((s) =>
+        ids.includes(String(s.id))
+      );
+
+      if (matchedServices.length > 0) {
+        handleAddService(matchedServices);
+      } else {
+        showSnackbar(
+          "Preferred services in URL are invalid or not found!",
+          "warning"
+        );
+      }
+    }
+
+    if (appointmentTimeStr) {
+      try {
+        const fixedAppointmentTimeStr = appointmentTimeStr.replace(" ", "+");
+        const appointmentDate = new Date(fixedAppointmentTimeStr);
+
+        if (!isNaN(appointmentDate)) {
+          // Hàm convert Date thành yyyy-MM-ddTHH:mm
+          const toLocalDatetimeString = (date) => {
+            const pad = (n) => (n < 10 ? "0" + n : n);
+            return (
+              date.getFullYear() +
+              "-" +
+              pad(date.getMonth() + 1) +
+              "-" +
+              pad(date.getDate()) +
+              "T" +
+              pad(date.getHours()) +
+              ":" +
+              pad(date.getMinutes())
+            );
+          };
+
+          setFormData((prev) => ({
+            ...prev,
+            date: toLocalDatetimeString(appointmentDate),
+          }));
+        } else {
+          console.log("Invalid appointment time in URL!", "warning");
+        }
+      } catch {
+        console.log("Invalid appointment time in URL!", "warning");
+      }
+    }
+  }, [services, location.search]);
 
   const [formData, setFormData] = useState({
     name: auth?.fullName || null,
@@ -66,14 +125,14 @@ const BookYourAppointment = () => {
       email: auth?.email || null,
       customer: auth?.userId || null,
       address: auth?.address || null,
+      title: auth?.fullName,
       carInfo: null,
       vehicle_information: null,
       date: null,
       note: null,
-      status: "pending",
       total_price: null,
-      title: auth?.fullName,
       pickup_time: null,
+      status: "pending",
     });
   }, [auth]);
 
