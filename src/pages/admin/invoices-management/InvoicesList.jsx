@@ -81,14 +81,6 @@ const InvoicesList = () => {
     );
   }
 
-  if (invoices.length === 0) {
-    return (
-      <Typography variant="h6" align="center" mt={4}>
-        No invoices found.
-      </Typography>
-    );
-  }
-
   const statusColors = {
     PENDING: "warning",
     REFUNDED: "info",
@@ -154,136 +146,148 @@ const InvoicesList = () => {
 
   return (
     <Box p={3}>
-      <InvoiceFilter onFilter={handleFilterChange} filters={filters} />
-      <List>
-        {invoices.map((item) => (
-          <Paper key={item.id} elevation={3} sx={{ mb: 2, p: 2 }}>
-            <ListItem alignItems="flex-start">
-              <ListItemText
-                primary={
-                  <Box
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Box>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold !important" }}
-                      >
-                        #{item.invoice_id} - {item.method.toUpperCase()}
-                        {dayjs()
-                          .tz("Asia/Ho_Chi_Minh")
-                          .diff(
-                            dayjs(item.create_at).tz("Asia/Ho_Chi_Minh"),
-                            "minute"
-                          ) < 5 && (
-                          <Chip
-                            label="Recently added"
-                            color="success"
-                            size="small"
-                            variant="outlined"
-                            sx={{ ml: 1 }}
-                          />
-                        )}
-                      </Typography>
-                    </Box>
-                    <Chip
-                      label={item.status.toUpperCase()}
-                      color={
-                        statusColors[item.status.toUpperCase()] || "default"
-                      }
-                      size="medium"
-                      variant="filled"
-                      sx={{
-                        verticalAlign: "middle",
-                        width: 100,
-                        textAlign: "center",
-                      }}
-                    />
-                  </Box>
-                }
-                secondary={
-                  <Box mt={1}>
-                    <Typography variant="body2" gutterBottom>
-                      Amount:{" "}
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        sx={{ fontWeight: "bold !important" }}
-                      >
-                        {parseFloat(item.amount).toLocaleString("vi-VN")} VND
-                      </Typography>
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Transaction ID:{" "}
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        sx={{ fontWeight: "bold !important" }}
-                      >
-                        {item.transaction_id || "N/A"}
-                      </Typography>
-                    </Typography>
-                    <Typography variant="body2" gutterBottom>
-                      Paid At:{" "}
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        sx={{ fontWeight: "bold !important" }}
-                      >
-                        {item.paid_at
-                          ? new Date(item.paid_at).toLocaleString("vi-VN", {
-                              dateStyle: "short",
-                              timeStyle: "short",
-                            })
-                          : "N/A"}
-                      </Typography>
-                    </Typography>
+      {/* Tách filter ra ngoài */}
+      <Box mb={3}>
+        <InvoiceFilter onFilter={handleFilterChange} filters={filters} />
+      </Box>
 
+      {/* Danh sách invoices hoặc thông báo nếu trống */}
+      {invoices.length === 0 ? (
+        <Typography variant="h6" color="text.secondary" align="center" mt={5}>
+          No invoices found.
+        </Typography>
+      ) : (
+        <List>
+          {invoices.map((item) => (
+            <Paper key={item.id} elevation={3} sx={{ mb: 2, p: 2 }}>
+              <ListItem alignItems="flex-start">
+                <ListItemText
+                  primary={
                     <Box
                       display="flex"
                       justifyContent="space-between"
                       alignItems="center"
                     >
-                      <Box display="flex" gap={1}>
-                        <Chip
-                          label={`${new Date(
-                            item.create_at
-                          ).toLocaleTimeString()}`}
-                          color="info"
-                          size="small"
-                          icon={<AccessTimeIcon />}
-                          variant="outlined"
-                        />
-                        <Chip
-                          label={`${new Date(
-                            item.update_at
-                          ).toLocaleTimeString()}`}
-                          color="warning"
-                          size="small"
-                          icon={<UpdateIcon />}
-                          variant="outlined"
-                        />
+                      <Box>
+                        <Typography
+                          variant="h6"
+                          sx={{ fontWeight: "bold !important" }}
+                        >
+                          #{item.invoice_id} - {item.method.toUpperCase()}
+                          {dayjs()
+                            .tz("Asia/Ho_Chi_Minh")
+                            .diff(
+                              dayjs(item.create_at).tz("Asia/Ho_Chi_Minh"),
+                              "minute"
+                            ) < 5 && (
+                            <Chip
+                              label="Recently added"
+                              color="success"
+                              size="small"
+                              variant="outlined"
+                              sx={{ ml: 1 }}
+                            />
+                          )}
+                        </Typography>
                       </Box>
-
-                      <IconButton
-                        onClick={() => {
-                          handleViewDetails(item);
+                      <Chip
+                        label={item.status.toUpperCase()}
+                        color={
+                          statusColors[item.status.toUpperCase()] || "default"
+                        }
+                        size="medium"
+                        variant="filled"
+                        sx={{
+                          verticalAlign: "middle",
+                          width: 100,
+                          textAlign: "center",
                         }}
-                        disabled={!nextPage}
-                        color="primary"
-                      >
-                        <VisibilityIcon />
-                      </IconButton>
+                      />
                     </Box>
-                  </Box>
-                }
-              />
-            </ListItem>
-          </Paper>
-        ))}
-      </List>
+                  }
+                  secondary={
+                    <Box mt={1}>
+                      <Typography variant="body2" gutterBottom>
+                        Amount:{" "}
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontWeight: "bold !important" }}
+                        >
+                          {parseFloat(item.amount).toLocaleString("vi-VN")} VND
+                        </Typography>
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        Transaction ID:{" "}
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontWeight: "bold !important" }}
+                        >
+                          {item.transaction_id || "N/A"}
+                        </Typography>
+                      </Typography>
+                      <Typography variant="body2" gutterBottom>
+                        Paid At:{" "}
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ fontWeight: "bold !important" }}
+                        >
+                          {item.paid_at
+                            ? new Date(item.paid_at).toLocaleString("vi-VN", {
+                                dateStyle: "short",
+                                timeStyle: "short",
+                              })
+                            : "N/A"}
+                        </Typography>
+                      </Typography>
+
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="center"
+                      >
+                        <Box display="flex" gap={1}>
+                          <Chip
+                            label={`${new Date(
+                              item.create_at
+                            ).toLocaleTimeString()}`}
+                            color="info"
+                            size="small"
+                            icon={<AccessTimeIcon />}
+                            variant="outlined"
+                          />
+                          <Chip
+                            label={`${new Date(
+                              item.update_at
+                            ).toLocaleTimeString()}`}
+                            color="warning"
+                            size="small"
+                            icon={<UpdateIcon />}
+                            variant="outlined"
+                          />
+                        </Box>
+
+                        <IconButton
+                          onClick={() => {
+                            handleViewDetails(item);
+                          }}
+                          color="primary"
+                        >
+                          <VisibilityIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                  }
+                />
+              </ListItem>
+            </Paper>
+          ))}
+        </List>
+      )}
+
+      {/* Pagination */}
       <Box
         display="flex"
         justifyContent="space-between"
@@ -311,6 +315,8 @@ const InvoicesList = () => {
           Next
         </Button>
       </Box>
+
+      {/* Dialog */}
       <Invoice
         invoiceData={selectedInvoice}
         open={invoiceDialogOpen}
