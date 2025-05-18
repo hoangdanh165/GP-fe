@@ -23,6 +23,7 @@ import {
   MenuItem,
   InputLabel,
   Select,
+  TextareaAutosize,
   TextField,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
@@ -454,40 +455,68 @@ const AddAppointmentDialog = ({
                   </Box>
                 )}
                 {formData.customer && (
-                  <Box display="flex" height={100} gap={2} alignItems="center">
-                    <Avatar
-                      src={formData.customer?.avatar}
-                      alt={formData.customer?.full_name}
-                      sx={{ width: 56, height: 56 }}
-                    />
-                    <Box>
-                      <Typography>
-                        Full Name: {formData.customer?.full_name || "N/A"}
-                      </Typography>
-                      <Typography>
-                        Phone: {formData.customer?.phone || "N/A"}
-                      </Typography>
-                      <Typography>
-                        Email: {formData.customer?.email || "N/A"}
-                      </Typography>
-                      {formData.additional_customer_information && (
-                        <>
-                          <Divider sx={{ my: 1 }} />
-                          <Typography variant="subtitle2" fontWeight="bold">
-                            Additional Information:
-                          </Typography>
-                          {Object.entries(
-                            formData.additional_customer_information
-                          ).map(([key, value]) => (
-                            <Typography key={key}>
-                              {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
-                              <Typography component="span" fontWeight="medium">
-                                {value || "N/A"}
-                              </Typography>
+                  <Box display="flex" flexDirection="column" gap={2}>
+                    <Box display="flex" gap={2}>
+                      <Avatar
+                        src={formData.customer?.avatar}
+                        alt={formData.customer?.full_name}
+                        sx={{ width: 56, height: 56 }}
+                      />
+                      <Box>
+                        <Typography>
+                          Full Name: {formData.customer?.full_name || "N/A"}
+                        </Typography>
+                        <Typography>
+                          Phone: {formData.customer?.phone || "N/A"}
+                        </Typography>
+                        <Typography>
+                          Email: {formData.customer?.email || "N/A"}
+                        </Typography>
+                        {formData.additional_customer_information && (
+                          <>
+                            <Divider sx={{ my: 1 }} />
+                            <Typography variant="subtitle2" fontWeight="bold">
+                              Additional Information:
                             </Typography>
-                          ))}
-                        </>
-                      )}
+                            {Object.entries(
+                              formData.additional_customer_information
+                            ).map(([key, value]) => (
+                              <Typography key={key}>
+                                {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
+                                <Typography
+                                  component="span"
+                                  fontWeight="medium"
+                                >
+                                  {value || "N/A"}
+                                </Typography>
+                              </Typography>
+                            ))}
+                          </>
+                        )}
+                      </Box>
+                    </Box>
+
+                    <Box>
+                      <TextareaAutosize
+                        minRows={4}
+                        maxRows={10}
+                        placeholder="Your note for this appointment"
+                        value={formData.note}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            note: e.target.value,
+                          }))
+                        }
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          fontSize: "16px",
+                          borderRadius: "4px",
+                          border: "1px solid #ccc",
+                          resize: "vertical",
+                        }}
+                      />
                     </Box>
                   </Box>
                 )}

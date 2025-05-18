@@ -16,9 +16,22 @@ const PaymentResult = () => {
 
   const isSuccess = responseCode === "00";
 
+  const formatPayDate = (dateString) => {
+    if (!dateString || dateString.length !== 14) return "Invalid date";
+
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    const hour = dateString.substring(8, 10);
+    const minute = dateString.substring(10, 12);
+    const second = dateString.substring(12, 14);
+
+    return `${hour}:${minute}:${second} ${day}/${month}/${year}`;
+  };
+
   return (
     <Container maxWidth="sm" sx={{ mt: 6 }}>
-      <Box textAlign="center">
+      <Box textAlign="left">
         {isSuccess ? (
           <Alert icon={<CheckCircleOutlineIcon />} severity="success">
             <Typography variant="h5" gutterBottom>
@@ -28,7 +41,7 @@ const PaymentResult = () => {
             <Typography>Amount: {parseInt(amount) / 100} VND</Typography>
             <Typography>Transaction No: {transactionNo}</Typography>
             <Typography>Bank Code: {bankCode}</Typography>
-            <Typography>Payment Date: {payDate}</Typography>
+            <Typography>Payment Date: {formatPayDate(payDate)}</Typography>
           </Alert>
         ) : (
           <Alert icon={<HighlightOffIcon />} severity="error">
@@ -39,10 +52,11 @@ const PaymentResult = () => {
             <Typography>Order ID: {orderId}</Typography>
           </Alert>
         )}
-
+      </Box>
+      <Box textAlign={"center"}>
         <Button variant="contained" color="primary" sx={{ mt: 4 }} href="/">
           Back to Home
-        </Button>
+        </Button>{" "}
       </Box>
     </Container>
   );

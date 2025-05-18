@@ -18,6 +18,7 @@ import {
   IconButton,
   Stack,
   CircularProgress,
+  TextareaAutosize,
   useTheme,
   Checkbox,
   Divider,
@@ -34,7 +35,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
-
+import PaymentMethodDialog from "./PaymentMethodDialog";
+import { set } from "react-hook-form";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -54,6 +56,8 @@ const AppointmentDialog = ({
   const [services, setServices] = useRecoilState(servicesAtom);
   const [loadingCreateInvoice, setLoadingCreateInvoice] = useState(false);
   const axiosPrivate = useAxiosPrivate();
+  const [paymentMethodDialogOpen, setPaymentMethodDialogOpen] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState("");
 
   const [invoiceData, setInvoiceData] = useState(null);
   const [invoiceDialogOpen, setInvoiceDialogOpen] = useState(false);
@@ -124,6 +128,11 @@ const AppointmentDialog = ({
     });
     setCurrentStatus("PENDING");
     onClose();
+  };
+
+  const handleMethodConfirm = async (method) => {
+    setSelectedMethod(method);
+    await handleCreateInvoice(method);
   };
 
   const handleAddService = (selectedServices) => {
@@ -373,15 +382,14 @@ const AppointmentDialog = ({
     }
   };
 
-  const handleCreateInvoice = async () => {
-    setInvoiceDialogOpen(true);
+  const handleCreateInvoice = async (method = null) => {
     setLoadingCreateInvoice(true);
     try {
       const response = await axiosPrivate.post(
         "/api/v1/payments/create-invoice/",
         {
           appointment: appoinmentData.id,
-          method: "cash",
+          method: method || "cash",
           amount: appoinmentData.total_price,
         }
       );
@@ -428,431 +436,478 @@ const AppointmentDialog = ({
   };
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      disablePortal
-      fullWidth
-      maxWidth="md"
-    >
-      <div ref={dialogRef}>
-        <DialogTitle align="center">APPOINTMENT DETAILS</DialogTitle>
-        <DialogContent>
-          <Grid container spacing={2} alignItems="stretch">
-            {/* Customer Info */}
-            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
-              <Paper variant="outlined" sx={{ p: 2, flexGrow: 1 }}>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  Customer Information
-                </Typography>
-                {loading ? (
-                  <Box
-                    height={100}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
+    <Box>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        disablePortal
+        fullWidth
+        maxWidth="md"
+      >
+        <div ref={dialogRef}>
+          <DialogTitle align="center">APPOINTMENT DETAILS</DialogTitle>
+          <DialogContent>
+            <Grid container spacing={2} alignItems="stretch">
+              {/* Customer Info */}
+              <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+                <Paper variant="outlined" sx={{ p: 2, flexGrow: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    gutterBottom
                   >
-                    <Typography color="text.secondary" fontStyle="italic">
-                      Loading Customer Information...
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Box display="flex" gap={2} alignItems={"center"}>
-                    <Avatar
-                      src={formData.customer?.avatar}
-                      alt={formData.customer?.full_name}
-                      sx={{ width: 56, height: 56 }}
-                    />
-                    <Box>
-                      <Typography>
-                        Full Name: {formData.customer?.full_name || "N/A"}
+                    Customer Information
+                  </Typography>
+                  {loading ? (
+                    <Box
+                      height={100}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Typography color="text.secondary" fontStyle="italic">
+                        Loading Customer Information...
                       </Typography>
-                      <Typography>
-                        Phone: {formData.customer?.phone || "N/A"}
-                      </Typography>
-                      <Typography>
-                        Email: {formData.customer?.email || "N/A"}
-                      </Typography>
-                      {formData.additional_customer_information && (
-                        <>
-                          <Divider sx={{ my: 1 }} />
-                          <Typography variant="subtitle2" fontWeight="bold">
-                            Additional Information:
+                    </Box>
+                  ) : (
+                    <Box display="flex" flexDirection="column" gap={2}>
+                      <Box display="flex" gap={2}>
+                        <Avatar
+                          src={formData.customer?.avatar}
+                          alt={formData.customer?.full_name}
+                          sx={{ width: 56, height: 56 }}
+                        />
+                        <Box>
+                          <Typography>
+                            Full Name: {formData.customer?.full_name || "N/A"}
                           </Typography>
-                          {Object.entries(
-                            formData.additional_customer_information
-                          ).map(([key, value]) => (
-                            <Typography key={key}>
-                              {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
-                              <Typography component="span" fontWeight="medium">
-                                {value || "N/A"}
+                          <Typography>
+                            Phone: {formData.customer?.phone || "N/A"}
+                          </Typography>
+                          <Typography>
+                            Email: {formData.customer?.email || "N/A"}
+                          </Typography>
+                          {formData.additional_customer_information && (
+                            <>
+                              <Divider sx={{ my: 1 }} />
+                              <Typography variant="subtitle2" fontWeight="bold">
+                                Additional Information:
                               </Typography>
-                            </Typography>
-                          ))}
-                        </>
+                              {Object.entries(
+                                formData.additional_customer_information
+                              ).map(([key, value]) => (
+                                <Typography key={key}>
+                                  {key.charAt(0).toUpperCase() + key.slice(1)}:{" "}
+                                  <Typography
+                                    component="span"
+                                    fontWeight="medium"
+                                  >
+                                    {value || "N/A"}
+                                  </Typography>
+                                </Typography>
+                              ))}
+                            </>
+                          )}
+                        </Box>
+                      </Box>
+
+                      <Box>
+                        <TextareaAutosize
+                          minRows={4}
+                          maxRows={10}
+                          value={formData.note || "No notes"}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              note: e.target.value,
+                            }))
+                          }
+                          style={{
+                            width: "100%",
+                            padding: "8px",
+                            fontSize: "16px",
+                            borderRadius: "4px",
+                            border: "1px solid #ccc",
+                            resize: "vertical",
+                          }}
+                        />
+                      </Box>
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
+
+              {/* Vehicle Info */}
+              <Grid item xs={12} md={6} sx={{ display: "flex" }}>
+                <Paper variant="outlined" sx={{ p: 2, flexGrow: 1 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight="bold"
+                    gutterBottom
+                  >
+                    Vehicle Information
+                  </Typography>
+
+                  {loading ? (
+                    <Box
+                      height={100}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Typography color="text.secondary" fontStyle="italic">
+                        Loading Vehicle Information...
+                      </Typography>
+                    </Box>
+                  ) : formData.vehicle_information &&
+                    Object.keys(formData.vehicle_information).length > 0 ? (
+                    <Box>
+                      {Object.entries(formData.vehicle_information).map(
+                        ([key, value]) => (
+                          <Typography key={key}>
+                            {key
+                              .replace(/_/g, " ")
+                              .replace(/\b\w/g, (c) => c.toUpperCase())}
+                            : {value}
+                          </Typography>
+                        )
                       )}
                     </Box>
-                  </Box>
-                )}
-              </Paper>
-            </Grid>
-
-            {/* Vehicle Info */}
-            <Grid item xs={12} md={6} sx={{ display: "flex" }}>
-              <Paper variant="outlined" sx={{ p: 2, flexGrow: 1 }}>
-                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                  Vehicle Information
-                </Typography>
-
-                {loading ? (
-                  <Box
-                    height={100}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Typography color="text.secondary" fontStyle="italic">
-                      Loading Vehicle Information...
-                    </Typography>
-                  </Box>
-                ) : formData.vehicle_information &&
-                  Object.keys(formData.vehicle_information).length > 0 ? (
-                  <Box>
-                    {Object.entries(formData.vehicle_information).map(
-                      ([key, value]) => (
-                        <Typography key={key}>
-                          {key
-                            .replace(/_/g, " ")
-                            .replace(/\b\w/g, (c) => c.toUpperCase())}
-                          : {value}
-                        </Typography>
-                      )
-                    )}
-                  </Box>
-                ) : (
-                  <Box
-                    height={100}
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <Typography color="text.secondary" fontStyle="italic">
-                      No Vehicle Information
-                    </Typography>
-                  </Box>
-                )}
-              </Paper>
-            </Grid>
-          </Grid>
-
-          {/* Services */}
-          <Box mt={3}>
-            <Paper variant="outlined" sx={{ p: 2 }}>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                Services
-              </Typography>
-              {/* Services list*/}
-              <Box display="flex" flexDirection="column" gap={1} mb={2}>
-                {formData.appointment_services?.length > 0 ? (
-                  formData.appointment_services.map((s) => (
-                    <Paper
-                      key={s.id}
-                      variant="outlined"
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        px: 2,
-                        py: 1,
-                      }}
+                  ) : (
+                    <Box
+                      height={100}
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
                     >
-                      <Box sx={{ flexGrow: 1 }}>
-                        <Typography fontWeight="bold">
-                          {s.service.name}
-                        </Typography>
-                      </Box>
+                      <Typography color="text.secondary" fontStyle="italic">
+                        No Vehicle Information
+                      </Typography>
+                    </Box>
+                  )}
+                </Paper>
+              </Grid>
+            </Grid>
 
-                      <Box sx={{ width: 150, textAlign: "left" }}>
-                        {(() => {
-                          const priceInfo = getDiscountedPrice(
-                            s.service,
-                            formData.date
-                          );
-
-                          return (
-                            <Box>
-                              <Typography fontWeight={"bold"}>
-                                {priceInfo.final} VND
-                              </Typography>
-                              {priceInfo.discounted && (
-                                <Typography
-                                  variant="body2"
-                                  color="text.secondary"
-                                  sx={{
-                                    textDecoration: "line-through",
-                                    fontSize: "0.75 rem",
-                                  }}
-                                >
-                                  {priceInfo.original} VND
-                                </Typography>
-                              )}
-                            </Box>
-                          );
-                        })()}
-                      </Box>
-
-                      <Box
+            {/* Services */}
+            <Box mt={3}>
+              <Paper variant="outlined" sx={{ p: 2 }}>
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+                  Services
+                </Typography>
+                {/* Services list*/}
+                <Box display="flex" flexDirection="column" gap={1} mb={2}>
+                  {formData.appointment_services?.length > 0 ? (
+                    formData.appointment_services.map((s) => (
+                      <Paper
+                        key={s.id}
+                        variant="outlined"
                         sx={{
-                          width: 130,
                           display: "flex",
                           alignItems: "center",
-                          gap: 0.5,
-                          justifyContent: "flex-start",
-                          pl: 2,
-                          mr: 2,
+                          px: 2,
+                          py: 1,
                         }}
                       >
-                        <AccessTimeIcon fontSize="small" />
-                        <Typography>{s.service.estimated_duration}</Typography>
-                        {formData?.status?.toUpperCase?.() === "PROCESSING" && (
-                          <Checkbox
+                        <Box sx={{ flexGrow: 1 }}>
+                          <Typography fontWeight="bold">
+                            {s.service.name}
+                          </Typography>
+                        </Box>
+
+                        <Box sx={{ width: 150, textAlign: "left" }}>
+                          {(() => {
+                            const priceInfo = getDiscountedPrice(
+                              s.service,
+                              formData.date
+                            );
+
+                            return (
+                              <Box>
+                                <Typography fontWeight={"bold"}>
+                                  {priceInfo.final} VND
+                                </Typography>
+                                {priceInfo.discounted && (
+                                  <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    sx={{
+                                      textDecoration: "line-through",
+                                      fontSize: "0.75 rem",
+                                    }}
+                                  >
+                                    {priceInfo.original} VND
+                                  </Typography>
+                                )}
+                              </Box>
+                            );
+                          })()}
+                        </Box>
+
+                        <Box
+                          sx={{
+                            width: 130,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.5,
+                            justifyContent: "flex-start",
+                            pl: 2,
+                            mr: 2,
+                          }}
+                        >
+                          <AccessTimeIcon fontSize="small" />
+                          <Typography>
+                            {s.service.estimated_duration}
+                          </Typography>
+                          {formData?.status?.toUpperCase?.() ===
+                            "PROCESSING" && (
+                            <Checkbox
+                              size="small"
+                              checked={s.completed || false}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  appointment_services:
+                                    prev.appointment_services.map((item) =>
+                                      item.id === s.id
+                                        ? { ...item, completed: checked }
+                                        : item
+                                    ),
+                                }));
+                              }}
+                            />
+                          )}
+                        </Box>
+
+                        <Box sx={{ width: 40, textAlign: "right" }}>
+                          <IconButton
+                            color="error"
+                            onClick={() => handleRemoveService(s.id)}
                             size="small"
-                            checked={s.completed || false}
-                            onChange={(e) => {
-                              const checked = e.target.checked;
+                          >
+                            <RemoveIcon />
+                          </IconButton>
+                        </Box>
+                      </Paper>
+                    ))
+                  ) : (
+                    <Typography color="text.secondary" fontStyle="italic">
+                      No services selected
+                    </Typography>
+                  )}
+                </Box>
+
+                {/* Summary + Add Service Button */}
+                <Box
+                  mt={2}
+                  pt={2}
+                  borderTop="1px solid"
+                  borderColor="divider"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Stack spacing={1}>
+                    <DateTimePicker
+                      label="Appointment Time"
+                      value={
+                        formData.date
+                          ? dayjs(formData.date)
+                          : dayjs().tz("Asia/Ho_Chi_Minh")
+                      }
+                      onChange={(newValue) => {
+                        const newDate = newValue?.toDate?.();
+                        console.log(newDate);
+                        setFormData((prev) => ({
+                          ...prev,
+                          date: newDate,
+                        }));
+                      }}
+                      slotProps={{
+                        textField: {
+                          fullWidth: true,
+                          size: "small",
+                        },
+                      }}
+                    />
+                    <Typography>
+                      Estimated Service Duration:{" "}
+                      <Box component="span" fontWeight="bold">
+                        {estimatedTotalTime.hours} hours{" "}
+                        {estimatedTotalTime.minutes} minutes
+                      </Box>
+                    </Typography>
+
+                    <Typography>
+                      Vehicle Ready Time:{" "}
+                      <Box component="span" fontWeight="bold">
+                        {estimatedTotalTime.doneTime?.toLocaleString?.() || ""}
+                      </Box>
+                    </Typography>
+
+                    <Typography>
+                      Total:{" "}
+                      <Box component="span" fontWeight="bold">
+                        {totalPrice?.toFixed(2)} VND
+                      </Box>
+                    </Typography>
+                  </Stack>
+                  <Stack spacing={1}>
+                    <Box
+                      alignItems={"flex-end"}
+                      display={"flex"}
+                      flexDirection={"column"}
+                      width={"200px"}
+                    >
+                      {formData?.status?.toUpperCase?.() === "PROCESSING" &&
+                        formData.appointment_services?.length > 0 && (
+                          <Button
+                            startIcon={<DoneAllIcon />}
+                            onClick={() => {
+                              const allCompleted =
+                                formData.appointment_services.every(
+                                  (s) => s.completed
+                                );
                               setFormData((prev) => ({
                                 ...prev,
                                 appointment_services:
-                                  prev.appointment_services.map((item) =>
-                                    item.id === s.id
-                                      ? { ...item, completed: checked }
-                                      : item
-                                  ),
+                                  prev.appointment_services.map((s) => ({
+                                    ...s,
+                                    completed: !allCompleted,
+                                  })),
                               }));
                             }}
-                          />
+                          >
+                            {formData.appointment_services.every(
+                              (s) => s.completed
+                            )
+                              ? "Undo"
+                              : "Mark All As Completed"}
+                          </Button>
                         )}
+                      <Button
+                        startIcon={<AddIcon />}
+                        onClick={() => setIsDialogOpen(true)}
+                      >
+                        Add Service
+                      </Button>
+                    </Box>
+                  </Stack>
+                </Box>
+                <Box
+                  mt={2}
+                  pt={2}
+                  borderTop="1px solid"
+                  borderColor="divider"
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Stack spacing={1}>
+                    <Typography>
+                      Created At:{" "}
+                      <Box component="span" fontWeight="bold">
+                        {formData.create_at
+                          ? new Date(formData.create_at).toLocaleString()
+                          : "N/A"}
                       </Box>
+                    </Typography>
 
-                      <Box sx={{ width: 40, textAlign: "right" }}>
-                        <IconButton
-                          color="error"
-                          onClick={() => handleRemoveService(s.id)}
-                          size="small"
-                        >
-                          <RemoveIcon />
-                        </IconButton>
+                    <Typography>
+                      Last Updated:{" "}
+                      <Box component="span" fontWeight="bold">
+                        {formData.update_at
+                          ? new Date(formData.update_at).toLocaleString()
+                          : "N/A"}
                       </Box>
-                    </Paper>
-                  ))
-                ) : (
-                  <Typography color="text.secondary" fontStyle="italic">
-                    No services selected
-                  </Typography>
-                )}
-              </Box>
+                    </Typography>
+                  </Stack>
+                </Box>
+              </Paper>
+            </Box>
 
-              {/* Summary + Add Service Button */}
-              <Box
-                mt={2}
-                pt={2}
-                borderTop="1px solid"
-                borderColor="divider"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Stack spacing={1}>
-                  <DateTimePicker
-                    label="Appointment Time"
-                    value={
-                      formData.date
-                        ? dayjs(formData.date)
-                        : dayjs().tz("Asia/Ho_Chi_Minh")
-                    }
-                    onChange={(newValue) => {
-                      const newDate = newValue?.toDate?.();
-                      console.log(newDate);
-                      setFormData((prev) => ({
-                        ...prev,
-                        date: newDate,
-                      }));
-                    }}
-                    slotProps={{
-                      textField: {
-                        fullWidth: true,
-                        size: "small",
-                      },
-                    }}
-                  />
-                  <Typography>
-                    Estimated Service Duration:{" "}
-                    <Box component="span" fontWeight="bold">
-                      {estimatedTotalTime.hours} hours{" "}
-                      {estimatedTotalTime.minutes} minutes
-                    </Box>
-                  </Typography>
-
-                  <Typography>
-                    Vehicle Ready Time:{" "}
-                    <Box component="span" fontWeight="bold">
-                      {estimatedTotalTime.doneTime?.toLocaleString?.() || ""}
-                    </Box>
-                  </Typography>
-
-                  <Typography>
-                    Total:{" "}
-                    <Box component="span" fontWeight="bold">
-                      {totalPrice?.toFixed(2)} VND
-                    </Box>
-                  </Typography>
-                </Stack>
-                <Stack spacing={1}>
-                  <Box
-                    alignItems={"flex-end"}
-                    display={"flex"}
-                    flexDirection={"column"}
-                    width={"200px"}
-                  >
-                    {formData?.status?.toUpperCase?.() === "PROCESSING" &&
-                      formData.appointment_services?.length > 0 && (
-                        <Button
-                          startIcon={<DoneAllIcon />}
-                          onClick={() => {
-                            const allCompleted =
-                              formData.appointment_services.every(
-                                (s) => s.completed
-                              );
-                            setFormData((prev) => ({
-                              ...prev,
-                              appointment_services:
-                                prev.appointment_services.map((s) => ({
-                                  ...s,
-                                  completed: !allCompleted,
-                                })),
-                            }));
-                          }}
-                        >
-                          {formData.appointment_services.every(
-                            (s) => s.completed
-                          )
-                            ? "Undo"
-                            : "Mark All As Completed"}
-                        </Button>
-                      )}
-                    <Button
-                      startIcon={<AddIcon />}
-                      onClick={() => setIsDialogOpen(true)}
-                    >
-                      Add Service
-                    </Button>
-                  </Box>
-                </Stack>
-              </Box>
-              <Box
-                mt={2}
-                pt={2}
-                borderTop="1px solid"
-                borderColor="divider"
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Stack spacing={1}>
-                  <Typography>
-                    Created At:{" "}
-                    <Box component="span" fontWeight="bold">
-                      {formData.create_at
-                        ? new Date(formData.create_at).toLocaleString()
-                        : "N/A"}
-                    </Box>
-                  </Typography>
-
-                  <Typography>
-                    Last Updated:{" "}
-                    <Box component="span" fontWeight="bold">
-                      {formData.update_at
-                        ? new Date(formData.update_at).toLocaleString()
-                        : "N/A"}
-                    </Box>
-                  </Typography>
-                </Stack>
-              </Box>
-            </Paper>
-          </Box>
-
-          {/* Summary */}
-        </DialogContent>
-      </div>
-      <DialogActions
-        sx={{
-          justifyContent: "space-between",
-          px: 3,
-          py: 2,
-        }}
-      >
-        <Button
-          variant="contained"
-          color={statusColors[formData.status?.toUpperCase?.() || "PENDING"]}
-          onClick={handleStatusCycle}
-          sx={{ width: 150, fontWeight: "bold", color: "white" }}
+            {/* Summary */}
+          </DialogContent>
+        </div>
+        <DialogActions
+          sx={{
+            justifyContent: "space-between",
+            px: 3,
+            py: 2,
+          }}
         >
-          {formData.status?.toUpperCase?.()}
-        </Button>
-
-        <Box>
-          {formData?.status?.toUpperCase?.() === "COMPLETED" &&
-            (formData?.invoice_created === false ? (
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={handleCreateInvoice}
-                disabled={loadingCreateInvoice}
-                sx={{ mr: 2 }}
-              >
-                {loadingCreateInvoice ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  "Create Invoice"
-                )}
-              </Button>
-            ) : (
-              <Button
-                variant="outlined"
-                color="secondary"
-                disabled={loadingCreateInvoice}
-                onClick={handleShowInvoice}
-                sx={{ mr: 2 }}
-              >
-                Show Invoice
-              </Button>
-            ))}
-
-          <Button onClick={captureDialog} variant="outlined" color="primary">
-            Export as Image
+          <Button
+            variant="contained"
+            color={statusColors[formData.status?.toUpperCase?.() || "PENDING"]}
+            onClick={handleStatusCycle}
+            sx={{ width: 150, fontWeight: "bold", color: "white" }}
+          >
+            {formData.status?.toUpperCase?.()}
           </Button>
 
-          <Button onClick={onClose} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} color="primary">
-            Save
-          </Button>
-        </Box>
-      </DialogActions>
-      <AddServiceDialog
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        services={services}
-        onAddServices={handleAddService}
+          <Box>
+            {formData?.status?.toUpperCase?.() === "COMPLETED" &&
+              (formData?.invoice_created === false ? (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => {
+                    setPaymentMethodDialogOpen(true);
+                  }}
+                  disabled={loadingCreateInvoice}
+                  sx={{ mr: 2 }}
+                >
+                  {loadingCreateInvoice ? (
+                    <CircularProgress size={24} />
+                  ) : (
+                    "Create Invoice"
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  disabled={loadingCreateInvoice}
+                  onClick={handleShowInvoice}
+                  sx={{ mr: 2 }}
+                >
+                  Show Invoice
+                </Button>
+              ))}
+
+            <Button onClick={captureDialog} variant="outlined" color="primary">
+              Export as Image
+            </Button>
+
+            <Button onClick={onClose} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} color="primary">
+              Save
+            </Button>
+          </Box>
+        </DialogActions>
+        <AddServiceDialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          services={services}
+          onAddServices={handleAddService}
+        />
+        <CustomSnackbar />
+        <Invoice
+          invoiceData={invoiceData}
+          open={invoiceDialogOpen}
+          onClose={handleCloseInvoiceDialog}
+        />
+        <LoadingOverlay loading={loading} />
+      </Dialog>
+      <PaymentMethodDialog
+        open={paymentMethodDialogOpen}
+        onClose={() => setPaymentMethodDialogOpen(false)}
+        onConfirm={handleMethodConfirm}
       />
-      <CustomSnackbar />
-      <Invoice
-        invoiceData={invoiceData}
-        open={invoiceDialogOpen}
-        onClose={handleCloseInvoiceDialog}
-      />
-      <LoadingOverlay loading={loading} />
-    </Dialog>
+    </Box>
   );
 };
 

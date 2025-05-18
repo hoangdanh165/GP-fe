@@ -24,18 +24,23 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import { useSocket } from "../../../contexts/SocketContext";
+import useShowSnackbar from "../../../hooks/useShowSnackbar";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const Invoice = ({ invoiceData, open, onClose }) => {
+const Invoice = ({ invoiceData, open, onClose, editMode = false }) => {
   const componentRef = useRef();
   const [formData, setFormData] = useState({});
-
+  const [statusChanged, setStatusChanged] = useState(false);
+  const { showSnackbar, CustomSnackbar } = useShowSnackbar();
+  const [loadingUpdateStatus, setLoadingUpdateStatus] = useState(false);
   const axiosPrivate = useAxiosPrivate();
+
   const { socket } = useSocket();
   const [loadingQrCode, setLoadingQrCode] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState(null);
+  const [editableStatus, setEditableStatus] = useState(null);
 
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
@@ -47,6 +52,7 @@ const Invoice = ({ invoiceData, open, onClose }) => {
   useEffect(() => {
     if (invoiceData) {
       setFormData(invoiceData);
+      setEditableStatus(invoiceData.status?.toLowerCase?.());
     }
   }, [invoiceData]);
 
@@ -171,16 +177,53 @@ const Invoice = ({ invoiceData, open, onClose }) => {
     },
   };
 
+  const statusCycle = ["pending", "paid", "refunded", "failed", "canceled"];
+
+  const getNextStatus = (current) => {
+    const idx = statusCycle.indexOf(current?.toLowerCase?.());
+    return statusCycle[(idx + 1) % statusCycle.length];
+  };
+
   const normalized = status?.toLowerCase?.();
-  const config = statusMap[normalized] || {
-    label: status,
+
+  const config = statusMap[editableStatus] || {
+    label: editableStatus,
     color: "default",
+  };
+
+  const updateStatus = async () => {
+    setLoadingUpdateStatus(true);
+    try {
+      const response = await axiosPrivate.patch(
+        `/api/v1/payments/update-status/`,
+        {
+          appointment_id: appointmentId,
+          status: editableStatus,
+        }
+      );
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setLoadingUpdateStatus(false);
+    }
+  };
+
+  const handleStatusClick = async () => {
+    if (!editMode) return;
+    const nextStatus = getNextStatus(editableStatus);
+    setEditableStatus(nextStatus);
+    setStatusChanged(true);
+  };
+
+  const handleClose = () => {
+    onClose();
+    setStatusChanged(false);
   };
 
   return (
     <Dialog
       open={open}
-      onClose={onClose}
+      onClose={handleClose}
       maxWidth="md"
       fullWidth
       sx={{
@@ -215,7 +258,7 @@ const Invoice = ({ invoiceData, open, onClose }) => {
         </style>
         <div ref={componentRef}>
           <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
-            <Box sx={{ textAlign: "left" }}>
+            <Box sx={{ textAlign: "center" }}>
               <PaymentQRCode paymentUrl={paymentUrl} />
               <Button
                 variant="outlined"
@@ -338,11 +381,11 @@ const Invoice = ({ invoiceData, open, onClose }) => {
                         <TableCell align="right">1</TableCell>
                         <TableCell align="right">Service</TableCell>
                         <TableCell align="right">
-                          ${parseFloat(price || 0).toFixed(2)}
+                          {parseFloat(price || 0).toFixed(2)} VND
                         </TableCell>
                         <TableCell align="right">0%</TableCell>
                         <TableCell align="right">
-                          ${parseFloat(price || 0).toFixed(2)}
+                          {parseFloat(price || 0).toFixed(2)} VND
                         </TableCell>
                       </TableRow>
                     );
@@ -382,13 +425,13 @@ const Invoice = ({ invoiceData, open, onClose }) => {
                   </TableCell>
                   <TableCell align="right">
                     <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                      $
                       {appointment_services
                         .reduce(
                           (total, item) => total + parseFloat(item.price || 0),
                           0
                         )
-                        .toFixed(2)}
+                        .toFixed(2)}{" "}
+                      VND
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -421,26 +464,43 @@ const Invoice = ({ invoiceData, open, onClose }) => {
         </div>
       </DialogContent>
       <DialogActions>
-        <Chip
-          label={config.label}
-          color={config.color}
-          variant="outlined"
-          size="medium"
-          sx={{
-            fontSize: "10rem",
-            padding: "0.1rem 0.5rem",
-            height: "40px",
-            fontWeight: 600,
-            textTransform: "uppercase",
-          }}
-        />
-        <Button onClick={handlePrint} color="primary" variant="contained">
-          Print Invoice
-        </Button>
-        <Button onClick={onClose} color="primary">
-          Close
-        </Button>
+        <Box display={"flex"} justifyContent={"space-between"} width={"100%"}>
+          <Box textAlign={"left"} display={"flex"}>
+            <Chip
+              label={config.label}
+              color={config.color}
+              variant="outlined"
+              size="medium"
+              onClick={handleStatusClick}
+              disabled={loadingUpdateStatus}
+              clickable={editMode}
+              sx={{
+                fontSize: "1rem",
+                padding: "0.1rem 0.5rem",
+                height: "40px",
+                width: "120px",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                cursor: editMode ? "pointer" : "default",
+              }}
+            />
+            {statusChanged && (
+              <Button onClick={updateStatus} color="primary">
+                Save
+              </Button>
+            )}
+          </Box>
+          <Box display={"flex"}>
+            <Button onClick={handlePrint} color="primary" variant="contained">
+              Print Invoice
+            </Button>
+            <Button onClick={onClose} color="primary">
+              Close
+            </Button>
+          </Box>
+        </Box>
       </DialogActions>
+      <CustomSnackbar />
     </Dialog>
   );
 };
