@@ -10,6 +10,7 @@ import {
   Chip,
   LinearProgress,
   Divider,
+  Button,
   Stack,
 } from "@mui/material";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
@@ -19,6 +20,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import UpdateIcon from "@mui/icons-material/Update";
+import Feedback from "./Feedback";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -28,6 +30,9 @@ const AppointmentsList = () => {
   const [loading, setLoading] = useState(true);
   const axiosPrivate = useAxiosPrivate();
   const { socket } = useSocket();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -92,6 +97,36 @@ const AppointmentsList = () => {
     PROCESSING: "info",
     COMPLETED: "success",
     CANCELED: "error",
+  };
+
+  const handleSendFeedback = (appointmentId) => {
+    setSelectedAppointmentId(appointmentId);
+    setFeedbackOpen(true);
+  };
+
+  const handleViewFeedback = async (appointmentId) => {
+    try {
+      const response = await axiosPrivate.get(
+        `/api/v1/feedbacks/get-by-appointment/?appointment_id=${appointmentId}`
+      );
+      setSelectedFeedback(response.data);
+      setFeedbackOpen(true);
+    } catch (error) {
+      console.error("Failed to fetch feedback:", error);
+    }
+
+    setFeedbackOpen(true);
+  };
+
+  const handleFeedbackSuccess = () => {
+    setAppointments((prev) =>
+      prev.map((item) =>
+        item.id === selectedAppointmentId
+          ? { ...item, feedback_sent: true }
+          : item
+      )
+    );
+    setFeedbackOpen(false);
   };
 
   return (
@@ -225,25 +260,61 @@ const AppointmentsList = () => {
                           </Typography>
                         </Stack>
                       </Box>
-                      <Stack direction="row" spacing={1} mt={1}>
-                        <Chip
-                          label={`${new Date(
-                            item.create_at
-                          ).toLocaleTimeString()}`}
-                          color="info"
-                          size="small"
-                          icon={<AccessTimeIcon />}
-                          variant="outlined"
-                        />
-                        <Chip
-                          label={`${new Date(
-                            item.update_at
-                          ).toLocaleTimeString()}`}
-                          color="warning"
-                          size="small"
-                          icon={<UpdateIcon />}
-                          variant="outlined"
-                        />
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        mt={1}
+                        alignItems="center"
+                      >
+                        <Box
+                          display="flex"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          width="100%"
+                        >
+                          <Box display="flex" gap={1}>
+                            <Chip
+                              label={`${new Date(
+                                item.create_at
+                              ).toLocaleTimeString()}`}
+                              color="info"
+                              size="small"
+                              icon={<AccessTimeIcon />}
+                              variant="outlined"
+                            />
+                            <Chip
+                              label={`${new Date(
+                                item.update_at
+                              ).toLocaleTimeString()}`}
+                              color="warning"
+                              size="small"
+                              icon={<UpdateIcon />}
+                              variant="outlined"
+                            />
+                          </Box>
+
+                          {item.status === "completed" && (
+                            <>
+                              {!item.feedback_sent ? (
+                                <Button
+                                  variant="outlined"
+                                  color="secondary"
+                                  onClick={() => handleSendFeedback(item.id)}
+                                >
+                                  Send Feedback
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="outlined"
+                                  color="primary"
+                                  onClick={() => handleViewFeedback(item.id)}
+                                >
+                                  View Feedback
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </Box>
                       </Stack>
                     </Box>
                   }
@@ -253,6 +324,13 @@ const AppointmentsList = () => {
           );
         })}
       </List>
+      <Feedback
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+        onSuccess={handleFeedbackSuccess}
+        appointmentId={selectedAppointmentId}
+        feedbackData={selectedFeedback}
+      />
     </Box>
   );
 };

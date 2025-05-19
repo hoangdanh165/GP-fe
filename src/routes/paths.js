@@ -19,7 +19,7 @@ export default {
   admin_chat: `${rootPaths.adminRoot}/chat`,
   accounts_management: `${rootPaths.adminRoot}/manage/accounts`,
   appointments_management: `${rootPaths.adminRoot}/manage/appointments`,
-  handle_feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
+  feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
   invoice_management_admin: `${rootPaths.adminRoot}/invoices-management`,
 
   // Customer paths

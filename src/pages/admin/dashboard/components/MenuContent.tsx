@@ -36,12 +36,10 @@ const mainListItems = [
 ];
 
 const secondaryListItems = [
-  { text: "Settings", icon: <SettingsRoundedIcon />, to: "/settings" },
-
   {
-    text: "Handle Feedbacks",
+    text: "Feedbacks",
     icon: <HelpRoundedIcon />,
-    to: paths.handle_feedbacks,
+    to: paths.feedbacks,
   },
 ];
 

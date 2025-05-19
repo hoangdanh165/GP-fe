@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Grid, Box, Stack, Typography } from "@mui/material";
-import CustomerCalendar from "./CustomerCalendar";
+import UsersTable from "./components/UsersTable";
 
-const AppointmentsManagement = () => {
+const UsersManagement = () => {
   return (
     <>
       <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
@@ -14,12 +14,12 @@ const AppointmentsManagement = () => {
             mb: 2,
           }}
         >
-          Customer Appointments
+          Users Management
         </Typography>
-        <CustomerCalendar />
+        <UsersTable />
       </Box>
     </>
   );
 };
 
-export default AppointmentsManagement;
+export default UsersManagement;

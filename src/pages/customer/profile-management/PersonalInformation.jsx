@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { IconButton } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
-
+import ChangePassword from "./ChangePassword";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
@@ -27,6 +27,7 @@ export default function Profile() {
   const [isChanged, setIsChanged] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
+  const [openChangePassword, setOpenChangePassword] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -237,6 +238,12 @@ export default function Profile() {
               </Grid>
               <Grid item xs={12}>
                 <Box display="flex" justifyContent="flex-end">
+                  <Button
+                    color="primary"
+                    onClick={() => setOpenChangePassword(true)}
+                  >
+                    Change Password
+                  </Button>
                   <Button color="primary" onClick={() => setIsEditing(true)}>
                     Edit
                   </Button>
@@ -246,6 +253,10 @@ export default function Profile() {
           )}
         </Grid>
       </Paper>
+      <ChangePassword
+        open={openChangePassword}
+        onClose={() => setOpenChangePassword(false)}
+      />
       <CustomSnackbar />
     </Box>
   );
