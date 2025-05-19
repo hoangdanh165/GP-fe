@@ -29,6 +29,11 @@ const mainListItems = [
     to: paths.accounts_management,
   },
   {
+    text: "Services",
+    icon: <PeopleRoundedIcon />,
+    to: paths.services_management,
+  },
+  {
     text: "Invoices",
     icon: <EventNoteRoundedIcon />,
     to: paths.invoice_management_admin,

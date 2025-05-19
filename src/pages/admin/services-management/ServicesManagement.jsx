@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Grid, Box, Stack, Typography } from "@mui/material";
-import UsersTable from "./components/UsersTable";
+import UsersTable from "./components/ServicesTable";
 
-const UsersManagement = () => {
+const ServicesManagement = () => {
   return (
     <>
       <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
@@ -14,7 +14,7 @@ const UsersManagement = () => {
             mb: 2,
           }}
         >
-          Users Management
+          Services Management
         </Typography>
         <UsersTable />
       </Box>
@@ -22,4 +22,4 @@ const UsersManagement = () => {
   );
 };
 
-export default UsersManagement;
+export default ServicesManagement;

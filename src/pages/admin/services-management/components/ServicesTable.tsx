@@ -1,6 +1,6 @@
 import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { useFetchAccounts } from "./usersData";
+import { useFetchServices } from "./servicesData";
 import { CircularProgress, Box, Stack, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import Avatar from "@mui/material/Avatar";
@@ -12,7 +12,7 @@ import {
   GridColDef,
   GridActionsCellItem,
 } from "@mui/x-data-grid";
-import UserDialog from "./UserDialog";
+import ServiceDialog from "./ServiceDialog";
 import { Tooltip } from "@mui/material";
 import useShowSnackbar from "../../../../hooks/useShowSnackbar";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
@@ -20,99 +20,90 @@ import IconifyIcon from "../../../../components/base/IconifyIcon";
 import useAuth from "../../../../hooks/useAuth";
 import { useSocket } from "../../../../contexts/SocketContext";
 
-export default function AccountsTable() {
+export default function ServicesTable() {
   const axiosPrivate = useAxiosPrivate();
   const { auth } = useAuth();
-  const { onlineUsers } = useSocket();
   const [isEditMode, setIsEditMode] = useState(false);
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
   const [reloadTrigger, setReloadTrigger] = useState(0);
-  const { rows, loading } = useFetchAccounts(reloadTrigger);
+  const { rows, loading } = useFetchServices(reloadTrigger);
   const [rowSelectionModel, setRowSelectionModel] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [open, setOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
 
   const handleCreate = () => {
     setIsEditMode(false);
-    setSelectedUser(null);
+    setSelectedService(null);
     setOpen(true);
   };
 
-  const handleEdit = (user) => {
-    console.log(user);
+  const handleEdit = (service) => {
+    console.log(service);
+    setSelectedService(service);
     setIsEditMode(true);
-    setSelectedUser(user);
     setOpen(true);
   };
 
   const handleSave = async (formData) => {
-    if (isEditMode) {
-      if (!selectedUser && !formData) {
-        return;
-      }
+    if (!formData) return;
 
-      await axiosPrivate.patch(
-        `/api/v1/users/${selectedUser.id}/partial_update_user/`,
-        {
-          email: formData.email,
-          status: formData.accountStatus,
-          email_verified: formData.emailVerified,
-          role: {
-            name: formData.role,
-          },
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+    const payload = {
+      name: formData.name,
+      description: formData.description,
+      price: formData.price,
+      discount: formData.discount,
+      discount_from: formData.discount_from,
+      discount_to: formData.discount_to,
+      estimated_duration: formData.estimated_duration,
 
-      setSelectedUser(null);
-      showSnackbar("Updated user successfully!", "info");
-      setReloadTrigger((prev) => prev + 1);
-      setOpen(false);
-      console.log("Updated account:", formData);
-    } else {
-      if (!formData) {
-        return;
-      }
-      if (!formData.role) {
-        showSnackbar("Please select a role!", "error");
-        return;
-      }
-      try {
-        const response = await axiosPrivate.post(
-          `/api/v1/users/create-user/`,
+      ...(formData.new_category
+        ? {
+            new_category: formData.new_category,
+            new_category_description: formData.new_category_description,
+          }
+        : formData.category
+        ? { category: formData.category.id || formData.category }
+        : {}),
+    };
+
+    try {
+      if (isEditMode) {
+        if (!selectedService) return;
+
+        await axiosPrivate.patch(
+          `/api/v1/services/${selectedService.id}/partial-update-service/`,
+          payload,
           {
-            full_name: formData.fullName,
-            phone: formData.phone,
-            address: formData.address,
-            email: formData.email,
-            status: formData.accountStatus,
-            role: {
-              name: formData.role,
-            },
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
           }
         );
-        console.log("Created new account:", response.data);
-        setOpen(false);
-        setReloadTrigger((prev) => prev + 1);
-      } catch (error) {
-        if (error) {
-          showSnackbar("Error creating new user!", "error");
-          return;
-        }
+
+        showSnackbar("Updated service successfully!", "info");
+        console.log("Updated service:", payload);
+      } else {
+        const response = await axiosPrivate.post(
+          `/api/v1/services/create-service/`,
+          payload,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        console.log("Created new service:", response.data);
+        showSnackbar("Created new service successfully!", "success");
       }
 
-      showSnackbar("Created new user successfully!", "success");
+      if (formData.new_category) {
+        fetchCategories();
+      }
+      setSelectedService(null);
+      setReloadTrigger((prev) => prev + 1);
+      setOpen(false);
+    } catch (error) {
+      console.error("Service save error:", error);
+      showSnackbar("Error saving service!", "error");
     }
-    setOpen(false);
   };
 
   const handleDelete = async (id) => {
@@ -120,23 +111,39 @@ export default function AccountsTable() {
 
     if (
       idsToDelete.length > 0 &&
-      window.confirm("Are you sure want to delete selected account(s)?")
+      window.confirm("Are you sure want to delete selected service(s)?")
     ) {
       try {
         const response = await axiosPrivate.post(
-          "/api/v1/users/delete-multiple/",
+          "/api/v1/services/delete-multiple/",
           {
             ids: idsToDelete,
           }
         );
-        showSnackbar("Deleted selected account(s) successfully!", "info");
+        showSnackbar("Deleted selected service(s) successfully!", "info");
         setReloadTrigger((prev) => prev + 1);
       } catch (error) {
-        console.error("Error deleting account(s):", error);
-        showSnackbar("Error deleting account(s)!", "error");
+        console.error("Error deleting service(s):", error);
+        showSnackbar("Error deleting service(s)!", "error");
       }
     }
   };
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axiosPrivate.get(
+        "/api/v1/services/all-categories/"
+      );
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error deleting service(s):", error);
+      showSnackbar("Error deleting service(s)!", "error");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   if (loading) {
     return (
@@ -152,18 +159,6 @@ export default function AccountsTable() {
         <CircularProgress />
       </Box>
     );
-  }
-
-  function renderStatus(userId: string, onlineUsers: string[]) {
-    const isOnline = onlineUsers?.includes(userId);
-    const status = isOnline ? "Online" : "Offline";
-
-    const colors: { [index: string]: "success" | "default" } = {
-      Online: "success",
-      Offline: "default",
-    };
-
-    return <Chip label={status} color={colors[status]} size="small" />;
   }
 
   function renderAvatar(params: GridCellParams<{ avatar: string }, any, any>) {
@@ -195,43 +190,26 @@ export default function AccountsTable() {
   }
 
   const columns: GridColDef[] = [
-    {
-      field: "avatar",
-      headerName: "",
-      headerAlign: "center",
-      align: "center",
-      flex: 0,
-      minWidth: 50,
-      renderCell: renderAvatar,
-    },
-    { field: "fullName", headerName: "Name", flex: 1, minWidth: 150 },
-    { field: "email", headerName: "Email", flex: 1.5, minWidth: 200 },
+    { field: "name", headerName: "Name", flex: 1.5, minWidth: 200 },
+    { field: "category_name", headerName: "Category", flex: 1, minWidth: 150 },
 
     {
-      field: "phone",
-      headerName: "Phone",
+      field: "price",
+      headerName: "Price",
       headerAlign: "center",
       align: "center",
       flex: 1,
       minWidth: 80,
     },
     {
-      field: "createAt",
-      headerName: "Join Day",
+      field: "discount",
+      headerName: "Discount",
       headerAlign: "center",
       align: "center",
       flex: 1,
-      minWidth: 100,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
       minWidth: 80,
-      renderCell: (params) => renderStatus(params.row.id, onlineUsers),
     },
+
     {
       field: "actions",
       type: "actions",
@@ -352,12 +330,13 @@ export default function AccountsTable() {
         }}
       />
       <CustomSnackbar />
-      <UserDialog
+      <ServiceDialog
         open={open}
         onClose={() => setOpen(false)}
-        userData={selectedUser}
+        serviceData={selectedService}
         onSave={handleSave}
         isEditMode={isEditMode}
+        categoryOptions={categories}
       />
     </Box>
   );

@@ -32,7 +32,9 @@ const InvoicesManagement = lazy(() =>
   import("../pages/admin/invoices-management/InvoicesManagement")
 );
 const Feedbacks = lazy(() => import("../pages/admin/feedbacks/Feedbacks"));
-
+const ServicesManagement = lazy(() =>
+  import("../pages/admin/services-management/ServicesManagement")
+);
 // Customer pages
 const ProfileManagement = lazy(() =>
   import("../pages/customer/profile-management/ProfileManagement")
@@ -147,10 +149,10 @@ const routes = [
             ),
           },
           {
-            path: paths.feedbacks,
+            path: paths.services_management,
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
-                <Feedbacks />
+                <ServicesManagement />
               </PrivateRoute>
             ),
           },

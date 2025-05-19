@@ -18,6 +18,7 @@ export default {
   dashboard: `${rootPaths.adminRoot}/dashboard`,
   admin_chat: `${rootPaths.adminRoot}/chat`,
   accounts_management: `${rootPaths.adminRoot}/manage/accounts`,
+  services_management: `${rootPaths.adminRoot}/manage/services`,
   appointments_management: `${rootPaths.adminRoot}/manage/appointments`,
   feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
   invoice_management_admin: `${rootPaths.adminRoot}/invoices-management`,
