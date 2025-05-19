@@ -10,9 +10,11 @@ import {
   useMediaQuery,
   MenuItem,
 } from "@mui/material";
+import useAuth from "../../../../hooks/useAuth";
 
 const UserDialog = ({ open, onClose, onSave, userData, isEditMode = true }) => {
   const [formData, setFormData] = useState(userData || {});
+  const { auth } = useAuth();
 
   const isDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
 
@@ -29,9 +31,12 @@ const UserDialog = ({ open, onClose, onSave, userData, isEditMode = true }) => {
   };
 
   useEffect(() => {
-    setFormData(userData || {});
-    console.log(formData);
-  }, [userData]);
+    const defaultData = isEditMode
+      ? userData || {}
+      : { ...userData, role: "customer" };
+
+    setFormData(defaultData);
+  }, [userData, isEditMode]);
 
   return (
     <Dialog
@@ -54,19 +59,21 @@ const UserDialog = ({ open, onClose, onSave, userData, isEditMode = true }) => {
           onChange={handleChange}
           margin="normal"
         />
-        <TextField
-          fullWidth
-          label="Role"
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          margin="normal"
-          select
-        >
-          <MenuItem value="customer">Customer</MenuItem>
-          <MenuItem value="admin">Admin</MenuItem>
-          <MenuItem value="sale">Sale</MenuItem>
-        </TextField>
+        {formData?.role && (
+          <TextField
+            fullWidth
+            label="Role"
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            margin="normal"
+            select
+          >
+            <MenuItem value="customer">Customer</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="sale">Sale</MenuItem>
+          </TextField>
+        )}
         <TextField
           fullWidth
           label="Address"
@@ -85,17 +92,27 @@ const UserDialog = ({ open, onClose, onSave, userData, isEditMode = true }) => {
           onChange={handleChange}
           margin="normal"
         />
-        {!isEditMode && (
+        <TextField
+          fullWidth
+          label="Phone"
+          name="phone"
+          disabled={isEditMode}
+          value={formData.phone || ""}
+          onChange={handleChange}
+          margin="normal"
+        />
+        {(!isEditMode || auth?.userId === formData.id) && (
           <TextField
             fullWidth
             label="Password"
-            disabled={isEditMode}
+            // disabled={isEditMode}
             name="password"
             value={formData.password || ""}
             onChange={handleChange}
             margin="normal"
           />
         )}
+
         <TextField
           fullWidth
           label="Email Verified"

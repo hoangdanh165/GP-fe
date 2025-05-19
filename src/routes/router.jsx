@@ -8,6 +8,7 @@ const App = lazy(() => import("../App"));
 // Layouts
 const AdminLayout = lazy(() => import("../layouts/AdminLayout"));
 const CustomerLayout = lazy(() => import("../layouts/CustomerLayout"));
+const SaleLayout = lazy(() => import("../layouts/SaleLayout"));
 
 // Auth pages
 const SignIn = lazy(() => import("../pages/auth/sign-in/SignIn"));
@@ -21,27 +22,35 @@ const Banned = lazy(() => import("../pages/error/Banned"));
 const Forbidden = lazy(() => import("../pages/error/Forbidden"));
 
 // Admin pages
-const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
+// const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
+
 const AccountsManagement = lazy(() =>
   import("../pages/admin/accounts-management/AccountsManagement")
 );
+
 const AppointmentsManagement = lazy(() =>
   import("../pages/admin/appointments-management/AppointmentsManagement")
 );
+
 const InvoicesManagement = lazy(() =>
   import("../pages/admin/invoices-management/InvoicesManagement")
 );
+
 const Feedbacks = lazy(() => import("../pages/admin/feedbacks/Feedbacks"));
+
 const ServicesManagement = lazy(() =>
   import("../pages/admin/services-management/ServicesManagement")
 );
+
 // Customer pages
 const ProfileManagement = lazy(() =>
   import("../pages/customer/profile-management/ProfileManagement")
 );
+
 const AppointmentsHistory = lazy(() =>
   import("../pages/customer/appoinment-history/AppointmentsHistory")
 );
+
 const Index = lazy(() =>
   import("../pages/customer/book-your-appointment/Index")
 );
@@ -50,6 +59,7 @@ const Index = lazy(() =>
 
 // General pages
 const Chat = lazy(() => import("../pages/chat/Chat"));
+
 const PaymentResult = lazy(() => import("../pages/payment/PaymentResult"));
 
 // Other components
@@ -77,9 +87,11 @@ const createMainLayoutCustomerRoutes = () => (
 );
 
 const createMainLayoutSaleRoutes = () => (
-  <Suspense fallback={<PageLoader />}>
-    <Outlet />
-  </Suspense>
+  <SaleLayout>
+    <Suspense fallback={<PageLoader />}>
+      <Outlet />
+    </Suspense>
+  </SaleLayout>
 );
 
 const createAuthLayoutRoutes = () => (
@@ -108,14 +120,14 @@ const routes = [
         path: rootPaths.adminRoot,
         element: <PersistSignin>{createMainLayoutAdminRoutes()}</PersistSignin>,
         children: [
-          {
-            path: paths.dashboard,
-            element: (
-              <PrivateRoute allowedRoles={["admin"]}>
-                <Dashboard />
-              </PrivateRoute>
-            ),
-          },
+          // {
+          //   path: paths.dashboard,
+          //   element: (
+          //     <PrivateRoute allowedRoles={["admin"]}>
+          //       <Dashboard />
+          //     </PrivateRoute>
+          //   ),
+          // },
           {
             path: paths.admin_chat,
             element: (
@@ -153,6 +165,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
                 <ServicesManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.feedbacks,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Feedbacks />
               </PrivateRoute>
             ),
           },
@@ -202,14 +222,38 @@ const routes = [
         path: rootPaths.saleRoot,
         element: <PersistSignin>{createMainLayoutSaleRoutes()}</PersistSignin>,
         children: [
-          // {
-          //   path: paths.profile,
-          //   element: (
-          //     <PrivateRoute allowedRoles={["sale"]}>
-          //     <UserProfile />
-          //   </PrivateRoute>
-          //   )
-          // },
+          {
+            path: paths.appointments_management_sale,
+            element: (
+              <PrivateRoute allowedRoles={["sale"]}>
+                <AppointmentsManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.invoice_management_sale,
+            element: (
+              <PrivateRoute allowedRoles={["sale"]}>
+                <InvoicesManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.feedbacks_sale,
+            element: (
+              <PrivateRoute allowedRoles={["sale"]}>
+                <Feedbacks />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.sale_chat,
+            element: (
+              <PrivateRoute allowedRoles={["sale"]}>
+                <Chat />
+              </PrivateRoute>
+            ),
+          },
         ],
       },
       {

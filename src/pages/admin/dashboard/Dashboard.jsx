@@ -70,23 +70,6 @@ const Dashboard = () => {
             <PageViewsBarChart />
           </Grid>
         </Grid>
-
-        <Grid container spacing={2} columns={12}>
-          <Grid item xs={12} lg={9}>
-            <CustomizedDataGrid />
-          </Grid>
-          <Grid item xs={12} lg={3}>
-            <Stack
-              gap={2}
-              direction={{ xs: "column", sm: "row", lg: "column" }}
-            >
-              <CustomizedTreeView />
-              <ChartUserByCountry />
-            </Stack>
-          </Grid>
-        </Grid>
-
-        <Copyright sx={{ my: 4 }} />
       </Box>
     </>
   );

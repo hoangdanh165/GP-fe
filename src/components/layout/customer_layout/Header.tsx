@@ -6,7 +6,6 @@ import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
 import MenuButton from "./MenuButton";
 import ColorModeIconDropdown from "../../../themes/shared-theme/ColorModeIconDropdown";
 
-import Search from "./Search";
 import useAuth from "../../../hooks/useAuth";
 import useNotification from "../../../hooks/useNotification";
 import NotificationBell from "./../../utils/NotificationBell";
@@ -34,7 +33,6 @@ export default function Header() {
     >
       <NavbarBreadcrumbs />
       <Stack direction="row" sx={{ gap: 1 }}>
-        <Search />
         <NotificationBell />
         <CustomDatePicker />
 

@@ -15,7 +15,6 @@ export default {
   forgot_password: `${rootPaths.authRoot}/forgot-password`,
 
   // Admin paths
-  dashboard: `${rootPaths.adminRoot}/dashboard`,
   admin_chat: `${rootPaths.adminRoot}/chat`,
   accounts_management: `${rootPaths.adminRoot}/manage/accounts`,
   services_management: `${rootPaths.adminRoot}/manage/services`,
@@ -32,6 +31,9 @@ export default {
   faq: `${rootPaths.customerRoot}/faq`,
   // Sale paths
   invoice_management_sale: `${rootPaths.saleRoot}/invoice-management`,
+  appointments_management_sale: `${rootPaths.saleRoot}/manage/appointments`,
+  feedbacks_sale: `${rootPaths.saleRoot}/service/feedbacks`,
+  sale_chat: `${rootPaths.saleRoot}/chat`,
 
   // Payment paths
   payment_result: `${rootPaths.paymentRoot}/result`,

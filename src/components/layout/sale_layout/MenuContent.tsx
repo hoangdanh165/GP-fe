@@ -16,27 +16,28 @@ import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useNavigate, useLocation } from "react-router-dom";
 import paths from "../../../routes/paths";
+
 const mainListItems = [
-  { text: "Profile", icon: <PersonRoundedIcon />, to: paths.customer_profile },
-  { text: "Chat", icon: <ChatRoundedIcon />, to: paths.customer_chat },
+  { text: "Chat", icon: <ChatRoundedIcon />, to: paths.sale_chat },
   {
-    text: "Appointments History",
+    text: "Appointments",
     icon: <EventNoteRoundedIcon />,
-    to: paths.appointments_history,
+    to: paths.appointments_management_sale,
   },
+
   {
-    text: "Book your appointment",
-    icon: <AccessTimeIcon />,
-    to: paths.book_your_appointment,
+    text: "Invoices",
+    icon: <EventNoteRoundedIcon />,
+    to: paths.invoice_management_sale,
   },
 ];
 
 const secondaryListItems = [
-  // {
-  //   text: "FAQ",
-  //   icon: <HelpRoundedIcon />,
-  //   to: paths.faq,
-  // },
+  {
+    text: "Feedbacks",
+    icon: <HelpRoundedIcon />,
+    to: paths.feedbacks_sale,
+  },
 ];
 
 export default function MenuContent() {

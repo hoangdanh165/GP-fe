@@ -19,6 +19,7 @@ const Feedback = ({
   appointmentId = null,
   feedbackData = null,
   onSuccess,
+  editMode = false,
 }) => {
   const [rating, setRating] = useState(feedbackData?.rating || 0);
   const [comment, setComment] = useState(feedbackData?.comment || "");
@@ -62,8 +63,8 @@ const Feedback = ({
   };
 
   const handleClose = () => {
-    setRating(feedbackData?.rating || 0);
-    setComment(feedbackData?.comment || "");
+    setRating(0);
+    setComment("");
     onClose();
   };
 
@@ -90,10 +91,14 @@ const Feedback = ({
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={handleClose} color="error">
+          <Button onClick={handleClose} color="error" disabled={editMode}>
             Cancel
           </Button>
-          <Button onClick={handleSubmit} color="secondary" disabled={loading}>
+          <Button
+            onClick={handleSubmit}
+            color="secondary"
+            disabled={loading | editMode}
+          >
             {loading ? "Submitting..." : "Submit"}
           </Button>
         </DialogActions>

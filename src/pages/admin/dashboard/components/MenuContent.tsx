@@ -14,9 +14,9 @@ import EventNoteRoundedIcon from "@mui/icons-material/EventNoteRounded";
 import HelpRoundedIcon from "@mui/icons-material/HelpRounded";
 import { useNavigate, useLocation } from "react-router-dom";
 import paths from "../../../../routes/paths";
+import ConstructionIcon from "@mui/icons-material/Construction";
 
 const mainListItems = [
-  { text: "Dashboard", icon: <HomeRoundedIcon />, to: paths.dashboard },
   { text: "Chat", icon: <ChatRoundedIcon />, to: paths.admin_chat },
   {
     text: "Appointments",
@@ -30,7 +30,7 @@ const mainListItems = [
   },
   {
     text: "Services",
-    icon: <PeopleRoundedIcon />,
+    icon: <ConstructionIcon />,
     to: paths.services_management,
   },
   {

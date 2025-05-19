@@ -47,20 +47,17 @@ export default function SideMenu() {
         }}
       >
         <Box
+          component="img"
+          src="/logo.png"
+          alt="Logo"
           sx={{
-            width: 100,
-            height: 50,
-            backgroundColor: "grey.300",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 1,
+            width: 150,
+            height: 60,
+            borderRadius: 2,
+            boxShadow: 3,
+            objectFit: "cover",
           }}
-        >
-          <Typography variant="caption" color="black">
-            LOGO Ở ĐÂY
-          </Typography>
-        </Box>
+        />
       </Box>
 
       <Divider />

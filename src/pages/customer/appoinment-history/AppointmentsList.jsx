@@ -33,6 +33,7 @@ const AppointmentsList = () => {
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -105,6 +106,7 @@ const AppointmentsList = () => {
   };
 
   const handleViewFeedback = async (appointmentId) => {
+    setEditMode(true);
     try {
       const response = await axiosPrivate.get(
         `/api/v1/feedbacks/get-by-appointment/?appointment_id=${appointmentId}`
@@ -116,6 +118,11 @@ const AppointmentsList = () => {
     }
 
     setFeedbackOpen(true);
+  };
+
+  const onCloseFeedback = () => {
+    setEditMode(false);
+    setFeedbackOpen(false);
   };
 
   const handleFeedbackSuccess = () => {
@@ -326,10 +333,11 @@ const AppointmentsList = () => {
       </List>
       <Feedback
         open={feedbackOpen}
-        onClose={() => setFeedbackOpen(false)}
+        onClose={onCloseFeedback}
         onSuccess={handleFeedbackSuccess}
         appointmentId={selectedAppointmentId}
         feedbackData={selectedFeedback}
+        editMode={editMode}
       />
     </Box>
   );

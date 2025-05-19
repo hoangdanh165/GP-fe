@@ -55,6 +55,7 @@ export default function AccountsTable() {
         `/api/v1/users/${selectedUser.id}/partial_update_user/`,
         {
           email: formData.email,
+          phone: formData.phone,
           status: formData.accountStatus,
           email_verified: formData.emailVerified,
           role: {

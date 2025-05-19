@@ -9,6 +9,7 @@ import {
   TextField,
   MenuItem,
   useMediaQuery,
+  Typography,
 } from "@mui/material";
 
 const ServiceDialog = ({
@@ -116,6 +117,16 @@ const ServiceDialog = ({
 
         <TextField
           fullWidth
+          label="Estimated Duration (hh:mm:ss)"
+          name="estimated_duration"
+          type="text"
+          value={formData.estimated_duration || ""}
+          onChange={handleChange}
+          margin="normal"
+        />
+
+        <TextField
+          fullWidth
           label="Discount (%)"
           name="discount"
           type="number"
@@ -123,10 +134,11 @@ const ServiceDialog = ({
           onChange={handleChange}
           margin="normal"
         />
-
+        <Typography variant="subtitle2" color="primary" mt={2}>
+          Discount From
+        </Typography>
         <TextField
           fullWidth
-          label="Discount From"
           name="discount_from"
           type="datetime-local"
           value={
@@ -136,22 +148,14 @@ const ServiceDialog = ({
           margin="normal"
         />
 
+        <Typography variant="subtitle2" color="primary" mt={2}>
+          Discount To
+        </Typography>
         <TextField
           fullWidth
-          label="Discount To"
           name="discount_to"
           type="datetime-local"
           value={formData.discount_to ? formData.discount_to.slice(0, 16) : ""}
-          onChange={handleChange}
-          margin="normal"
-        />
-
-        <TextField
-          fullWidth
-          label="Estimated Duration (hh:mm:ss)"
-          name="estimated_duration"
-          type="text"
-          value={formData.estimated_duration || ""}
           onChange={handleChange}
           margin="normal"
         />
