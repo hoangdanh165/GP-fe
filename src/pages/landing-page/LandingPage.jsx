@@ -209,7 +209,7 @@ const LandingPage = () => {
               color="primary"
               size="large"
             >
-              Book Appointment!
+              Book NOW!
             </Button>
           )}
         </Container>
