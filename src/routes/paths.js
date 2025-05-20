@@ -6,6 +6,7 @@ export const rootPaths = {
   saleRoot: "/sale",
   paymentRoot: "/payment",
   customerRoot: "/customer",
+  homeRoot: "/home",
 };
 
 export default {
@@ -37,6 +38,9 @@ export default {
 
   // Payment paths
   payment_result: `${rootPaths.paymentRoot}/result`,
+
+  // Home paths
+  landing_page: `${rootPaths.homeRoot}/landing-page`,
 
   // Error paths
   404: `${rootPaths.errorRoot}/404`,

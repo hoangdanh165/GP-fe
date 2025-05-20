@@ -55,7 +55,8 @@ const Index = lazy(() =>
   import("../pages/customer/book-your-appointment/Index")
 );
 
-// Sale pages
+// Home pages
+import LandingPage from "../pages/landing-page/LandingPage";
 
 // General pages
 const Chat = lazy(() => import("../pages/chat/Chat"));
@@ -266,7 +267,19 @@ const routes = [
           },
         ],
       },
-
+      {
+        path: rootPaths.homeRoot,
+        children: [
+          {
+            path: paths.landing_page,
+            element: (
+              <PersistSignin>
+                <LandingPage />
+              </PersistSignin>
+            ),
+          },
+        ],
+      },
       {
         path: rootPaths.authRoot,
         element: createAuthLayoutRoutes(),
