@@ -199,11 +199,29 @@ const SignIn = (props) => {
           sx={{ position: "fixed", top: "1rem", right: "1rem" }}
         />
         <Card variant="outlined">
-          <SitemarkIcon />
+          <Box
+            component="img"
+            src="/logo.png"
+            alt="Logo"
+            sx={{
+              width: 150,
+              height: 60,
+              borderRadius: 2,
+              boxShadow: 0,
+              objectFit: "cover",
+              alignSelf: "center",
+            }}
+          />
           <Typography
             component="h1"
             variant="h4"
-            sx={{ width: "100%", fontSize: "clamp(2rem, 10vw, 2.15rem)" }}
+            sx={{
+              width: "100%",
+              fontSize: "clamp(2rem, 10vw, 2.15rem)",
+              alignItems: "center",
+              display: "flex",
+              justifyContent: "center",
+            }}
           >
             Sign in
           </Typography>
