@@ -515,6 +515,9 @@ const AppointmentDialog = ({
                         <TextareaAutosize
                           minRows={4}
                           maxRows={10}
+                          disabled={
+                            formData.status?.toUpperCase?.() === "COMPLETED"
+                          }
                           value={formData.note || "No notes"}
                           onChange={(e) =>
                             setFormData((prev) => ({
@@ -685,6 +688,9 @@ const AppointmentDialog = ({
                             color="error"
                             onClick={() => handleRemoveService(s.id)}
                             size="small"
+                            disabled={
+                              formData.status?.toUpperCase?.() === "COMPLETED"
+                            }
                           >
                             <RemoveIcon />
                           </IconButton>
@@ -789,6 +795,9 @@ const AppointmentDialog = ({
                       <Button
                         startIcon={<AddIcon />}
                         onClick={() => setIsDialogOpen(true)}
+                        disabled={
+                          formData.status?.toUpperCase?.() === "COMPLETED"
+                        }
                       >
                         Add Service
                       </Button>

@@ -4,13 +4,13 @@ import dayjs from "dayjs";
 
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 
-export const useFetchAccounts = (reloadTrigger: number) => {
+export const useFetchCars = (reloadTrigger: number) => {
   const [rows, setRows] = useState<GridRowsProp>([]);
   const axios = useAxiosPrivate();
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchAccounts = async () => {
+    const fetchCars = async () => {
       setLoading(true);
       try {
         const response = await axios.get("/api/v1/cars/");
@@ -38,7 +38,7 @@ export const useFetchAccounts = (reloadTrigger: number) => {
       }
     };
 
-    fetchAccounts();
+    fetchCars();
   }, [axios, reloadTrigger]);
 
   return { rows, loading };

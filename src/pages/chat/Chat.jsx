@@ -34,7 +34,9 @@ import useShowSnackbar from "../../hooks/useShowSnackbar";
 const NODE_JS_HOST = import.meta.env.VITE_NODE_JS_HOST;
 const CONVERSATION_API = "/api/v1/conversations/";
 const CREATE_CONVERSATION_API = "/api/v1/conversations/";
-const USERS_LIST_API = "/api/v1/users/get-staff/";
+const STAFFS_LIST_API = "/api/v1/users/get-staff/";
+const ALL_USERS_LIST_API = "/api/v1/users/get-all-users/";
+let USER_LIST_API = null;
 
 export default function ChatUI() {
   const theme = useTheme();
@@ -45,7 +47,7 @@ export default function ChatUI() {
 
   const [loadingConversations, setLoadingConversations] = useState(true);
   const [newConversationDialog, setNewConversationDialog] = useState(false);
-  const [staffs, setStaffs] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [conversations, setConversations] = useRecoilState(conversationsAtom);
@@ -85,7 +87,7 @@ export default function ChatUI() {
       });
 
       setNewConversationDialog(false);
-      setStaffs([]);
+      setUsers([]);
     } catch (error) {
       console.log(error);
       showSnackbar("Error creating conversation", "error");
@@ -95,20 +97,24 @@ export default function ChatUI() {
   };
 
   const handleNewConversation = async () => {
-    if (staffs.length == 0) {
+    USER_LIST_API =
+      auth.role === "customer" ? STAFFS_LIST_API : ALL_USERS_LIST_API;
+
+    if (users.length === 0) {
       try {
         setLoading(true);
-        const response = await axios.get(USERS_LIST_API);
-        setStaffs(response.data);
+        const response = await axios.get(USER_LIST_API);
+        setUsers(response.data);
         setNewConversationDialog(true);
       } catch (error) {
-        console.log(error);
-        showSnackbar("Error fetching staffs!", "error");
+        console.error(error);
+        showSnackbar("Error fetching users!", "error");
       } finally {
         setLoading(false);
       }
+    } else {
       setNewConversationDialog(true);
-    } else setNewConversationDialog(true);
+    }
   };
 
   useEffect(() => {
@@ -314,7 +320,7 @@ export default function ChatUI() {
       <NewConversationDialog
         open={newConversationDialog}
         onClose={() => setNewConversationDialog(false)}
-        staffList={staffs}
+        userList={users}
         onCreateConversation={handleCreateConversation}
         loading={loading}
       />

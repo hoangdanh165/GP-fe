@@ -1,6 +1,6 @@
 import * as React from "react";
 import { DataGrid } from "@mui/x-data-grid";
-import { useFetchAccounts } from "./vehiclesData";
+import { useFetchCars } from "./vehiclesData";
 import { CircularProgress, Box, Stack, IconButton } from "@mui/material";
 import { useEffect, useState } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -18,7 +18,7 @@ export default function VehiclesTable() {
   const [isEditMode, setIsEditMode] = useState(false);
   const { showSnackbar, CustomSnackbar } = useShowSnackbar();
   const [reloadTrigger, setReloadTrigger] = useState(0);
-  const { rows, loading } = useFetchAccounts(reloadTrigger);
+  const { rows, loading } = useFetchCars(reloadTrigger);
   const [rowSelectionModel, setRowSelectionModel] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
