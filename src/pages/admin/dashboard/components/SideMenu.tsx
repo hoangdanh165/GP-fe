@@ -10,7 +10,8 @@ import Typography from "@mui/material/Typography";
 import MenuContent from "./MenuContent";
 import OptionsMenu from "./OptionsMenu";
 import useAuth from "../../../../hooks/useAuth";
-
+import { useNavigate } from "react-router-dom";
+import paths from "../../../../routes/paths";
 const drawerWidth = 240;
 
 const Drawer = styled(MuiDrawer)({
@@ -26,6 +27,11 @@ const Drawer = styled(MuiDrawer)({
 
 export default function SideMenu() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    navigate(paths.landing_page);
+  };
 
   return (
     <Drawer
@@ -50,6 +56,7 @@ export default function SideMenu() {
           component="img"
           src="/logo.png"
           alt="Logo"
+          onClick={handleLogoClick}
           sx={{
             width: 150,
             height: 60,

@@ -6,7 +6,8 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-
+import { useNavigate } from "react-router-dom";
+import paths from "../../../routes/paths";
 import MenuContent from "./MenuContent";
 import OptionsMenu from "./OptionsMenu";
 
@@ -27,7 +28,11 @@ const Drawer = styled(MuiDrawer)({
 
 export default function SideMenu() {
   const { auth } = useAuth();
+  const navigate = useNavigate();
 
+  const handleLogoClick = () => {
+    navigate(paths.landing_page);
+  };
   return (
     <Drawer
       variant="permanent"
@@ -51,6 +56,7 @@ export default function SideMenu() {
           component="img"
           src="/logo.png"
           alt="Logo"
+          onClick={handleLogoClick}
           sx={{
             width: 150,
             height: 60,
