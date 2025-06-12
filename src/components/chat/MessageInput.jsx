@@ -37,6 +37,27 @@ const MessageInput = ({ setMessages }) => {
   const { handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
   const [isSending, setIsSending] = useState(false);
 
+  const uploadMessageImage = async () => {
+    const file = imageRef.current?.files?.[0];
+
+    if (!file) {
+      console.error("No image file provided");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await axiosPrivate.post(
+      `/api/v1/messages/upload-image/`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    return res.data;
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
@@ -46,6 +67,22 @@ const MessageInput = ({ setMessages }) => {
     setIsSending(true);
 
     try {
+      let image_url = "";
+      let image_path = "";
+
+      if (imageRef.current?.files?.[0]) {
+        const imageRes = await uploadMessageImage();
+        if (!imageRes?.image_url) {
+          throw new Error("Failed to upload image");
+        }
+        image_url = imageRes.image_url;
+
+        const urlParts = image_url.split("/");
+        const filename = urlParts[urlParts.length - 1];
+
+        image_path = `media/message_images/${filename}`;
+      }
+
       const res = await fetch(`${NODE_JS_HOST}/api/v1/messages`, {
         method: "POST",
         headers: {
@@ -56,6 +93,8 @@ const MessageInput = ({ setMessages }) => {
           message: messageText,
           receiver: selectedConversation?.userId,
           conversation: selectedConversation?._id,
+          image_path: image_path,
+          image_url: image_url,
         }),
       });
 
@@ -71,7 +110,7 @@ const MessageInput = ({ setMessages }) => {
           if (conversation.id === selectedConversation._id) {
             return {
               ...conversation,
-              last_message: data.message,
+              last_message: data.image ? "[Image]" : data.message,
               last_sender: data.sender,
             };
           }
@@ -82,6 +121,7 @@ const MessageInput = ({ setMessages }) => {
 
       setMessageText("");
       setImgUrl("");
+      if (imageRef.current) imageRef.current.value = "";
     } catch (error) {
       console.error("Error sending message: ", error.message);
       showSnackbar(error.message, "error");
@@ -107,13 +147,12 @@ const MessageInput = ({ setMessages }) => {
           sx={{
             "& .MuiOutlinedInput-root": {
               borderRadius: "20px",
-              paddingRight: "12px", // Để nút không bị tràn
+              paddingRight: "12px",
             },
           }}
         />
       </Box>
 
-      {/* Nút Gửi hoặc Chọn ảnh */}
       {messageText.length > 0 ? (
         <IconButton
           onClick={handleSendMessage}

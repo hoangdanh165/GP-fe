@@ -5,6 +5,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import { selectedConversationAtom } from "../../atoms/messagesAtom";
 import { BsCheck2All } from "react-icons/bs";
+import { Dialog } from "@mui/material";
 
 import useAuth from "./../../hooks/useAuth";
 
@@ -12,6 +13,8 @@ const Message = ({ ownMessage, message, isLastMessage }) => {
   const selectedConversation = useRecoilValue(selectedConversationAtom);
   const { auth } = useAuth();
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogImage, setDialogImage] = useState("");
 
   return (
     <Box
@@ -77,13 +80,13 @@ const Message = ({ ownMessage, message, isLastMessage }) => {
       )}
 
       {/* Image Message */}
-      {message.img && (
+      {message.image && (
         <Box sx={{ position: "relative", width: 200, marginTop: 1 }}>
           {!imgLoaded && (
             <Skeleton variant="rectangular" width={200} height={200} />
           )}
           <img
-            src={message.img}
+            src={message.image}
             alt="Message"
             style={{
               width: "200px",
@@ -91,21 +94,40 @@ const Message = ({ ownMessage, message, isLastMessage }) => {
               display: imgLoaded ? "block" : "none",
             }}
             onLoad={() => setImgLoaded(true)}
+            onClick={() => {
+              setDialogImage(message.image);
+              setOpenDialog(true);
+            }}
           />
           {ownMessage && imgLoaded && (
-            <IconButton
+            <Box
               sx={{
-                position: "absolute",
-                bottom: 5,
-                right: 5,
-                color: message.seen ? "blue" : "inherit",
+                alignSelf: "flex-end",
+                mt: 0.5,
+                mr: 0,
+                color: message.seen ? "blue" : "",
+                fontWeight: "bold",
               }}
             >
-              {message.seen ? <DoneAllIcon /> : <CheckIcon />}
-            </IconButton>
+              <BsCheck2All size={16} />
+            </Box>
           )}
         </Box>
       )}
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        maxWidth="lg"
+      >
+        <img
+          src={dialogImage}
+          alt="Full-size"
+          style={{
+            maxWidth: "90vw",
+            maxHeight: "90vh",
+          }}
+        />
+      </Dialog>
     </Box>
   );
 };
