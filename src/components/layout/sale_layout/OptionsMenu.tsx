@@ -30,6 +30,9 @@ export default function OptionsMenu() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleProfile = () => {
+    navigate("/sale/profile");
+  };
 
   const handleLogOut = async () => {
     await logout();
@@ -55,6 +58,7 @@ export default function OptionsMenu() {
         sx={{
           [`& .${listClasses.root}`]: {
             padding: "4px",
+            width: 150,
           },
           [`& .${paperClasses.root}`]: {
             padding: 0,
@@ -64,10 +68,9 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Account & Profile</MenuItem>
+        <MenuItem onClick={handleProfile}>Account & Profile</MenuItem>
         <Divider />
-        <MenuItem onClick={handleClose}>Settings</MenuItem>
-        <Divider />
+
         <MenuItem
           onClick={handleLogOut}
           sx={{

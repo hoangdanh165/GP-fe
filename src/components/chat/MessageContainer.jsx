@@ -68,6 +68,7 @@ const MessageContainer = () => {
         });
         return updatedConversations;
       });
+      showSnackbar("You have a new message.", "info");
     });
 
     return () => socket.off("newMessage");

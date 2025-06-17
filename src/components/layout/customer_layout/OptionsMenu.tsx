@@ -55,6 +55,7 @@ export default function OptionsMenu() {
         sx={{
           [`& .${listClasses.root}`]: {
             padding: "4px",
+            width: 150,
           },
           [`& .${paperClasses.root}`]: {
             padding: 0,
@@ -64,10 +65,6 @@ export default function OptionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>Account & Profile</MenuItem>
-        <Divider />
-        <MenuItem onClick={handleClose}>Settings</MenuItem>
-        <Divider />
         <MenuItem
           onClick={handleLogOut}
           sx={{

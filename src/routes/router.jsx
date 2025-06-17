@@ -42,6 +42,10 @@ const ServicesManagement = lazy(() =>
   import("../pages/admin/services-management/ServicesManagement")
 );
 
+const AdminProfileManagement = lazy(() =>
+  import("../pages/admin/profile/AdminProfileManagement")
+);
+
 // Customer pages
 const ProfileManagement = lazy(() =>
   import("../pages/customer/profile-management/ProfileManagement")
@@ -177,6 +181,14 @@ const routes = [
               </PrivateRoute>
             ),
           },
+          {
+            path: paths.admin_profile,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <AdminProfileManagement />
+              </PrivateRoute>
+            ),
+          },
         ],
       },
       {
@@ -228,6 +240,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["sale"]}>
                 <AppointmentsManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.sale_profile,
+            element: (
+              <PrivateRoute allowedRoles={["sale"]}>
+                <AdminProfileManagement />
               </PrivateRoute>
             ),
           },

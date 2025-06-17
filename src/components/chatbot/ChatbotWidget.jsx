@@ -37,14 +37,13 @@ const ChatbotWidget = ({ currentUser }) => {
             position: "fixed",
             bottom: 24,
             right: 24,
-            bgcolor: "primary.main",
+            bgcolor: "white",
             color: "white",
-            "&:hover": { bgcolor: "primary.dark" },
             zIndex: 2000,
           }}
           onClick={() => setOpen(true)}
         >
-          <ChatIcon />
+          <Avatar src={avatar} alt="Chatbot" sx={{ width: 40, height: 40 }} />
         </IconButton>
       )}
 

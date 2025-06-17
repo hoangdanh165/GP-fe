@@ -136,6 +136,7 @@ export default function ChatUI() {
     socket.on("newConversation", (conversationData) => {
       if (conversationData) {
         setConversations((prev) => [...prev, conversationData]);
+        showSnackbar("You have a new message", "info");
       }
     });
 

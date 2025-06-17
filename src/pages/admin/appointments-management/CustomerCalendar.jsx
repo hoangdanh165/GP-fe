@@ -229,6 +229,48 @@ const CustomerCalendar = () => {
       } catch (nodeError) {
         console.error("Gửi sang Node thất bại:", nodeError);
       }
+
+      const changedFields = [];
+      if (appointmentDetails) {
+        if (formData.date !== appointmentDetails.date)
+          changedFields.push("Thời gian hẹn");
+        if (
+          formData.vehicle_ready_time !== appointmentDetails.vehicle_ready_time
+        )
+          changedFields.push("Thời gian xe sẵn sàng");
+        if (formData.status !== appointmentDetails.status)
+          changedFields.push("Trạng thái");
+        if (formData.total_price !== appointmentDetails.total_price)
+          changedFields.push("Tổng tiền");
+        if (formData.title !== appointmentDetails.title)
+          changedFields.push("Tiêu đề");
+        if (formData.note !== appointmentDetails.note)
+          changedFields.push("Ghi chú");
+        if (
+          formData.vehicle_information !==
+          appointmentDetails.vehicle_information
+        )
+          changedFields.push("Thông tin xe");
+      }
+      if (changedFields.length > 0) {
+        try {
+          await sendNotification({
+            user_id: formData.customer,
+            params: {
+              appointmentId: selectedEvent.id,
+              time: formData.date,
+            },
+            type: "WEB",
+            reminder_type: "APPOINTMENT_UPDATED",
+          });
+          console.log(
+            "Đã gửi thông báo thay đổi appointment cho khách hàng:",
+            changedFields
+          );
+        } catch (notifyError) {
+          console.error("Lỗi khi gửi thông báo:", notifyError);
+        }
+      }
     } catch (error) {
       console.error("Error saving appointment:", error);
       showSnackbar("Error saving appointment", "error");
@@ -252,6 +294,7 @@ const CustomerCalendar = () => {
         ]);
         console.log("Added appointment from WebSocket:", formData.id);
       }
+      showSnackbar("A customer has booked a new appointment!", "info");
     });
 
     return () => {

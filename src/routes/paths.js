@@ -22,6 +22,7 @@ export default {
   appointments_management: `${rootPaths.adminRoot}/manage/appointments`,
   feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
   invoice_management_admin: `${rootPaths.adminRoot}/invoices-management`,
+  admin_profile: `${rootPaths.adminRoot}/profile`,
 
   // Customer paths
   customer_chat: `${rootPaths.customerRoot}/chat`,
@@ -35,7 +36,7 @@ export default {
   appointments_management_sale: `${rootPaths.saleRoot}/manage/appointments`,
   feedbacks_sale: `${rootPaths.saleRoot}/service/feedbacks`,
   sale_chat: `${rootPaths.saleRoot}/chat`,
-
+  sale_profile: `${rootPaths.saleRoot}/profile`,
   // Payment paths
   payment_result: `${rootPaths.paymentRoot}/result`,
 
