@@ -107,7 +107,7 @@ export default function TopCustomersTable() {
       headerName: "Full Name",
       headerAlign: "center",
       align: "center",
-      flex: 1,
+      flex: 0,
       minWidth: 100,
     },
     {
@@ -152,7 +152,6 @@ export default function TopCustomersTable() {
         Top Customers
       </Typography>
       <DataGrid
-        checkboxSelection
         rows={rows}
         columns={columns}
         getRowClassName={(params) =>

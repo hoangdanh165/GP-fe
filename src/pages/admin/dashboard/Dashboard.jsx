@@ -3,7 +3,7 @@ import { Grid, Box, Typography } from "@mui/material";
 import StatCard from "./components/StatCard";
 import HighlightedCard from "./components/HighlightedCard";
 import PageViewsBarChart from "./components/PageViewsBarChart";
-import SessionsChart from "./components/SessionsChart";
+import CategoriesChart from "./components/CategoriesChart";
 import CustomizedDataGrid from "./components/CustomizedDataGrid";
 import TopCustomersTable from "./components/TopCustomersTable";
 import useAxiosPrivate from "./../../../hooks/useAxiosPrivate";
@@ -64,7 +64,7 @@ const Dashboard = () => {
           <HighlightedCard />
         </Grid>
         <Grid item xs={12} md={6}>
-          <SessionsChart />
+          <CategoriesChart />
         </Grid>
         <Grid item xs={12} md={6}>
           <PageViewsBarChart />

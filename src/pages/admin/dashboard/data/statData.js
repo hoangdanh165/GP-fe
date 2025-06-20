@@ -4,17 +4,13 @@ export const fetchUserStats = async (axios) => {
 };
 
 export const fetchConversions = async (axios) => {
-  // Fake data mẫu
-  return {
-    title: "Conversions",
-    value: "325",
-    interval: "Last 30 days",
-    trend: "down",
-    data: Array.from({ length: 30 }, () => Math.floor(Math.random() * 1000)),
-  };
+  const res = await axios.get(
+    "api/v1/appointments/stats/appointments-last-30-days"
+  );
+  return res.data;
 };
 
-export const fetchEventCounts = async () => {
+export const fetchEventCounts = async (axios) => {
   return {
     title: "Event count",
     value: "200k",
@@ -22,4 +18,11 @@ export const fetchEventCounts = async () => {
     trend: "neutral",
     data: Array.from({ length: 30 }, () => Math.floor(Math.random() * 800)),
   };
+};
+
+export const fetchCategoryCount = async (axios) => {
+  const res = await axios.get(
+    "/api/v1/services/stats/category-usage-last-30-days"
+  );
+  return res.data;
 };
