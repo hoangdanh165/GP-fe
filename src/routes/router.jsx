@@ -22,8 +22,7 @@ const Banned = lazy(() => import("../pages/error/Banned"));
 const Forbidden = lazy(() => import("../pages/error/Forbidden"));
 
 // Admin pages
-// const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
-
+const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
 const AccountsManagement = lazy(() =>
   import("../pages/admin/accounts-management/AccountsManagement")
 );
@@ -125,14 +124,14 @@ const routes = [
         path: rootPaths.adminRoot,
         element: <PersistSignin>{createMainLayoutAdminRoutes()}</PersistSignin>,
         children: [
-          // {
-          //   path: paths.dashboard,
-          //   element: (
-          //     <PrivateRoute allowedRoles={["admin"]}>
-          //       <Dashboard />
-          //     </PrivateRoute>
-          //   ),
-          // },
+          {
+            path: paths.dashboard,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <Dashboard />
+              </PrivateRoute>
+            ),
+          },
           {
             path: paths.admin_chat,
             element: (

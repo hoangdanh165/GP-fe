@@ -23,6 +23,7 @@ export default {
   feedbacks: `${rootPaths.adminRoot}/service/feedbacks`,
   invoice_management_admin: `${rootPaths.adminRoot}/invoices-management`,
   admin_profile: `${rootPaths.adminRoot}/profile`,
+  dashboard: `${rootPaths.adminRoot}/dashboard`,
 
   // Customer paths
   customer_chat: `${rootPaths.customerRoot}/chat`,
@@ -37,6 +38,7 @@ export default {
   feedbacks_sale: `${rootPaths.saleRoot}/service/feedbacks`,
   sale_chat: `${rootPaths.saleRoot}/chat`,
   sale_profile: `${rootPaths.saleRoot}/profile`,
+
   // Payment paths
   payment_result: `${rootPaths.paymentRoot}/result`,
 
