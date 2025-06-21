@@ -128,7 +128,7 @@ export default function TopCustomersTable() {
     },
     {
       field: "appointment_count",
-      headerName: "NO. of Appointments",
+      headerName: "No. of Appointments",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -151,45 +151,47 @@ export default function TopCustomersTable() {
       <Typography component="h2" variant="subtitle2" gutterBottom>
         Top Customers
       </Typography>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        getRowClassName={(params) =>
-          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-        }
-        initialState={{
-          pagination: { paginationModel: { pageSize: 20 } },
-        }}
-        pageSizeOptions={[10, 20, 50]}
-        disableColumnResize
-        density="compact"
-        slotProps={{
-          filterPanel: {
-            filterFormProps: {
-              logicOperatorInputProps: {
-                variant: "outlined",
-                size: "small",
-              },
-              columnInputProps: {
-                variant: "outlined",
-                size: "small",
-                sx: { mt: "auto" },
-              },
-              operatorInputProps: {
-                variant: "outlined",
-                size: "small",
-                sx: { mt: "auto" },
-              },
-              valueInputProps: {
-                InputComponentProps: {
+      <Box sx={{ p: 2 }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          getRowClassName={(params) =>
+            params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+          }
+          initialState={{
+            pagination: { paginationModel: { pageSize: 20 } },
+          }}
+          pageSizeOptions={[10, 20, 50]}
+          disableColumnResize
+          density="compact"
+          slotProps={{
+            filterPanel: {
+              filterFormProps: {
+                logicOperatorInputProps: {
                   variant: "outlined",
                   size: "small",
                 },
+                columnInputProps: {
+                  variant: "outlined",
+                  size: "small",
+                  sx: { mt: "auto" },
+                },
+                operatorInputProps: {
+                  variant: "outlined",
+                  size: "small",
+                  sx: { mt: "auto" },
+                },
+                valueInputProps: {
+                  InputComponentProps: {
+                    variant: "outlined",
+                    size: "small",
+                  },
+                },
               },
             },
-          },
-        }}
-      />
+          }}
+        />
+      </Box>
     </Card>
   );
 }

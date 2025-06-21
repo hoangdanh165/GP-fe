@@ -47,6 +47,7 @@ const AddAppointmentDialog = ({
   onSave,
   selectedDate,
   loading,
+  initialVehicleInputs = [],
 }) => {
   const axiosPrivate = useAxiosPrivate();
   const dialogRef = useRef();
@@ -58,7 +59,12 @@ const AddAppointmentDialog = ({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [services, setServices] = useRecoilState(servicesAtom);
   const [customers, setCustomers] = useRecoilState(customersAtom);
-  const [vehicleInputs, setVehicleInputs] = useState([{ key: "", value: "" }]);
+  const [vehicleInputs, setVehicleInputs] = useState(
+    initialVehicleInputs.length > 0
+      ? initialVehicleInputs
+      : [{ key: "", value: "" }]
+  );
+
   const [loadingCustomer, setLoadingCustomer] = useState(false);
 
   const statusOptions = [
@@ -380,6 +386,11 @@ const AddAppointmentDialog = ({
         date: selectedDate,
         appointment_services: [],
       });
+      setVehicleInputs(
+        initialVehicleInputs.length > 0
+          ? initialVehicleInputs
+          : [{ key: "", value: "" }]
+      );
     }
   }, [open]);
 
@@ -500,7 +511,7 @@ const AddAppointmentDialog = ({
                       <TextareaAutosize
                         minRows={4}
                         maxRows={10}
-                        placeholder="Your note for this appointment"
+                        placeholder="Customer's note for this appointment"
                         value={formData.note}
                         onChange={(e) =>
                           setFormData((prev) => ({

@@ -2,33 +2,34 @@ import React, { useEffect, useState } from "react";
 import { Grid, Box, Typography } from "@mui/material";
 import StatCard from "./components/StatCard";
 import HighlightedCard from "./components/HighlightedCard";
-import PageViewsBarChart from "./components/PageViewsBarChart";
+import PopularTimeSlotsChart from "./components/PopularTimeSlotsChart";
 import CategoriesChart from "./components/CategoriesChart";
 import CustomizedDataGrid from "./components/CustomizedDataGrid";
+import FeedbackStatCard from "./components/FeedbackStatCard";
 import TopCustomersTable from "./components/TopCustomersTable";
 import useAxiosPrivate from "./../../../hooks/useAxiosPrivate";
 import {
   fetchUserStats,
-  fetchConversions,
-  fetchEventCounts,
+  fetchAppointmentStats,
+  fetchFeedbackStats,
 } from "./data/statData";
 
 const Dashboard = () => {
   const axiosPrivate = useAxiosPrivate();
   const [userStat, setUserStat] = useState(null);
-  const [conversionStat, setConversionStat] = useState(null);
-  const [eventStat, setEventStat] = useState(null);
+  const [appointmentStat, setAppointmentStat] = useState(null);
+  const [feedbackStat, setFeedbackStat] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const user = await fetchUserStats(axiosPrivate);
-        const conversions = await fetchConversions(axiosPrivate);
-        const events = await fetchEventCounts(axiosPrivate);
+        const conversions = await fetchAppointmentStats(axiosPrivate);
+        const feedbackStat = await fetchFeedbackStats(axiosPrivate);
 
         setUserStat(user);
-        setConversionStat(conversions);
-        setEventStat(events);
+        setAppointmentStat(conversions);
+        setFeedbackStat(feedbackStat);
       } catch (err) {
         console.error("Error loading stats:", err);
       }
@@ -49,14 +50,14 @@ const Dashboard = () => {
             <StatCard {...userStat} />
           </Grid>
         )}
-        {conversionStat && (
+        {appointmentStat && (
           <Grid item xs={12} sm={6} lg={3}>
-            <StatCard {...conversionStat} />
+            <StatCard {...appointmentStat} />
           </Grid>
         )}
-        {eventStat && (
+        {feedbackStat && (
           <Grid item xs={12} sm={6} lg={3}>
-            <StatCard {...eventStat} />
+            <FeedbackStatCard {...feedbackStat} />
           </Grid>
         )}
 
@@ -67,7 +68,7 @@ const Dashboard = () => {
           <CategoriesChart />
         </Grid>
         <Grid item xs={12} md={6}>
-          <PageViewsBarChart />
+          <PopularTimeSlotsChart />
         </Grid>
         <Grid item xs={12}>
           <TopCustomersTable />

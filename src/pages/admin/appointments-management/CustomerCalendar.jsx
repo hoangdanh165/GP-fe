@@ -302,6 +302,18 @@ const CustomerCalendar = () => {
     };
   }, [socket]);
 
+  const defaultVehicleInputs = [
+    { key: "name", value: "" },
+    { key: "brand", value: "" },
+    { key: "color", value: "" },
+    { key: "year", value: "" },
+    { key: "engine_type", value: "" },
+    { key: "current_odometer", value: "" },
+    { key: "license_plate", value: "" },
+    { key: "registration_province", value: "" },
+    { key: "vin", value: "" },
+  ];
+
   return (
     <Box
       width="100%"
@@ -334,6 +346,7 @@ const CustomerCalendar = () => {
         selectedDate={selectedDate}
         onSave={handleSaveAdd}
         loading={loading}
+        initialVehicleInputs={defaultVehicleInputs}
       />
       <CustomSnackbar />
     </Box>

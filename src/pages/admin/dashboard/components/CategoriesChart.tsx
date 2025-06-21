@@ -87,20 +87,8 @@ export default function CategoriesChart() {
           Popular category
         </Typography>
         <Stack sx={{ justifyContent: "space-between" }}>
-          <Stack
-            direction="row"
-            sx={{
-              alignContent: { xs: "center", sm: "flex-start" },
-              alignItems: "center",
-              gap: 1,
-            }}
-          >
-            <Typography variant="h4" component="p">
-              {total.toLocaleString()}
-            </Typography>
-          </Stack>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Total service usages by category (last 30 days)
+            Total service booked by category (last 30 days)
           </Typography>
         </Stack>
         <LineChart

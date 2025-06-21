@@ -3,21 +3,28 @@ export const fetchUserStats = async (axios) => {
   return res.data;
 };
 
-export const fetchConversions = async (axios) => {
+export const fetchAppointmentStats = async (axios) => {
   const res = await axios.get(
     "api/v1/appointments/stats/appointments-last-30-days"
   );
   return res.data;
 };
 
-export const fetchEventCounts = async (axios) => {
-  return {
-    title: "Event count",
-    value: "200k",
-    interval: "Last 30 days",
-    trend: "neutral",
-    data: Array.from({ length: 30 }, () => Math.floor(Math.random() * 800)),
-  };
+export const fetchFeedbackStats = async (axios) => {
+  const res = await axios.get("api/v1/feedbacks/stats/average-rating-all-time");
+  return res.data;
+  // return {
+  //   title: "Garage's Ratings",
+  //   value: "4.5",
+  //   total: 200,
+  // };
+};
+
+export const fetchPopularTimeSlotsStats = async (axiosInstance) => {
+  const res = await axiosInstance.get(
+    "api/v1/appointments/stats/popular-time-slots"
+  );
+  return res.data;
 };
 
 export const fetchCategoryCount = async (axios) => {
