@@ -45,7 +45,7 @@ export default function PopularTimeSlotsChart() {
         </Typography>
         <Stack sx={{ justifyContent: "space-between" }}>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Bookings per time slot (last 30 days)
+            Bookings per time slot (all time)
           </Typography>
         </Stack>
 

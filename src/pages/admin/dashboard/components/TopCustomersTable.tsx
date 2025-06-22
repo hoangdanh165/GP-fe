@@ -149,7 +149,7 @@ export default function TopCustomersTable() {
   return (
     <Card variant="outlined" sx={{ height: "100%", flexGrow: 1 }}>
       <Typography component="h2" variant="subtitle2" gutterBottom>
-        Top Customers
+        Top Customers (last 30 days)
       </Typography>
       <Box sx={{ p: 2 }}>
         <DataGrid

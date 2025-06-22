@@ -18,6 +18,11 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import InsertChartIcon from "@mui/icons-material/InsertChart";
 
 const mainListItems = [
+  {
+    text: "Statistics",
+    icon: <InsertChartIcon />,
+    to: paths.dashboard,
+  },
   { text: "Chat", icon: <ChatRoundedIcon />, to: paths.admin_chat },
   {
     text: "Appointments",
@@ -38,11 +43,6 @@ const mainListItems = [
     text: "Invoices",
     icon: <EventNoteRoundedIcon />,
     to: paths.invoice_management_admin,
-  },
-  {
-    text: "Statistics",
-    icon: <InsertChartIcon />,
-    to: paths.dashboard,
   },
 ];
 

@@ -22,7 +22,7 @@ export default function HighlightedCard() {
           gutterBottom
           sx={{ fontWeight: "600" }}
         >
-          More charts
+          Other charts
         </Typography>
         <Typography sx={{ color: "text.secondary", mb: "8px" }}>
           Show more details about your business with additional charts and

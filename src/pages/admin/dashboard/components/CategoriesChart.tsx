@@ -2,86 +2,91 @@ import * as React from "react";
 import { useTheme } from "@mui/material/styles";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Chip from "@mui/material/Chip";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
-import { LineChart } from "@mui/x-charts/LineChart";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-
+import { BarChart } from "@mui/x-charts/BarChart";
 import useAxiosPrivate from "./../../../../hooks/useAxiosPrivate";
 import { fetchCategoryCount } from "../data/statData";
-dayjs.extend(utc);
-dayjs.extend(timezone);
+import Tooltip from "@mui/material/Tooltip";
+import Box from "@mui/material/Box";
 
-const TIMEZONE = "Asia/Ho_Chi_Minh";
-
-function AreaGradient({ color, id }: { color: string; id: string }) {
-  return (
-    <defs>
-      <linearGradient id={id} x1="50%" y1="0%" x2="50%" y2="100%">
-        <stop offset="0%" stopColor={color} stopOpacity={0.5} />
-        <stop offset="100%" stopColor={color} stopOpacity={0} />
-      </linearGradient>
-    </defs>
-  );
-}
-
-function getLast30Days() {
-  const days: string[] = [];
-
-  for (let i = 29; i >= 0; i--) {
-    const date = dayjs().tz(TIMEZONE).subtract(i, "day");
-    const label = date.format("MMM D");
-    days.push(label);
-  }
-
-  return days;
-}
-
-export default function CategoriesChart() {
+export default function CategoriesBarChart() {
   const theme = useTheme();
   const axios = useAxiosPrivate();
-  const data = getLast30Days();
+  const [categories, setCategories] = React.useState<string[]>([]);
+  const [values, setValues] = React.useState<number[]>([]);
+  const [tooltips, setTooltips] = React.useState<Record<string, string>>({});
+  const [tooltipData, setTooltipData] = React.useState<{
+    open: boolean;
+    x: number;
+    y: number;
+    content: string;
+  }>({
+    open: false,
+    x: 0,
+    y: 0,
+    content: "",
+  });
 
-  const [series, setSeries] = React.useState<any[]>([]);
-  const [total, setTotal] = React.useState(0);
+  const chartRef = React.useRef<HTMLDivElement>(null);
 
-  const colorPalette = [
-    theme.palette.primary.light,
-    theme.palette.primary.main,
-    theme.palette.primary.dark,
-    theme.palette.success.main,
-    theme.palette.secondary.main,
-  ];
+  const color = theme.palette.primary.main;
 
   React.useEffect(() => {
     const load = async () => {
       const res = await fetchCategoryCount(axios);
       if (res?.data) {
-        const result: any[] = res.data.map((item, index) => ({
-          ...item,
-          color: colorPalette[index % colorPalette.length],
-          showMark: false,
-          curve: "linear",
-          area: true,
-          stack: "total",
-          stackOrder: "ascending",
-        }));
-        const totalCount = res.data.reduce(
-          (acc, item) => acc + item.data.reduce((s, v) => s + v, 0),
-          0
-        );
-        setSeries(result);
-        setTotal(totalCount);
+        const labels = res.data.map((item: any) => item.label);
+        const totals = res.data.map((item: any) => item.total);
+
+        const tooltipMap: Record<string, string> = {};
+        res.data.forEach((cat: any) => {
+          const details = cat.services
+            .map((svc: any) => `• ${svc.name}: ${svc.count}`)
+            .join("\n");
+          tooltipMap[cat.label] = details;
+        });
+
+        setCategories(labels);
+        setValues(totals);
+        setTooltips(tooltipMap);
       }
     };
+
     load();
   }, [axios]);
 
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    const bars = chartRef.current?.querySelectorAll("rect");
+    if (!bars) return;
+
+    const { clientX, clientY } = event;
+
+    bars.forEach((bar, index) => {
+      const rect = bar.getBoundingClientRect();
+      if (
+        clientX >= rect.left &&
+        clientX <= rect.right &&
+        clientY >= rect.top &&
+        clientY <= rect.bottom
+      ) {
+        const label = categories[index];
+        setTooltipData({
+          open: true,
+          x: event.clientX,
+          y: event.clientY - 20,
+          content: `${label}\n${tooltips[label]}`,
+        });
+      }
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setTooltipData({ ...tooltipData, open: false });
+  };
+
   return (
-    <Card variant="outlined" sx={{ width: "100%" }}>
+    <Card variant="outlined" sx={{ width: "100%", position: "relative" }}>
       <CardContent>
         <Typography component="h2" variant="subtitle2" gutterBottom>
           Popular category
@@ -91,34 +96,44 @@ export default function CategoriesChart() {
             Total service booked by category (last 30 days)
           </Typography>
         </Stack>
-        <LineChart
-          colors={colorPalette}
-          xAxis={[
-            {
-              scaleType: "point",
-              data,
-              tickInterval: (index, i) => (i + 1) % 5 === 0,
-            },
-          ]}
-          series={series}
-          height={250}
-          margin={{ left: 50, right: 20, top: 20, bottom: 20 }}
-          grid={{ horizontal: true }}
-          sx={{
-            "& .MuiAreaElement-series-organic": {
-              fill: "url('#organic')",
-            },
-          }}
-          slotProps={{
-            legend: {
-              hidden: false,
-            },
-          }}
+
+        <Box
+          ref={chartRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
         >
-          {series.map((item) => (
-            <AreaGradient key={item.id} color={item.color} id={item.id} />
-          ))}
-        </LineChart>
+          <BarChart
+            xAxis={[{ scaleType: "band", data: categories }]}
+            series={[{ data: values, color }]}
+            height={300}
+            margin={{ left: 40, right: 20, top: 30, bottom: 40 }}
+            sx={{
+              ".MuiChartsTooltip-root": { display: "none" },
+            }}
+            slotProps={{ tooltip: { trigger: "none" } }}
+          />
+        </Box>
+
+        {tooltipData.open && (
+          <Box
+            sx={{
+              position: "fixed",
+              top: tooltipData.y,
+              left: tooltipData.x,
+              backgroundColor: "rgba(0,0,0,0.8)",
+              color: "#fff",
+              px: 1,
+              py: 0.5,
+              borderRadius: 1,
+              fontSize: 12,
+              whiteSpace: "pre-line",
+              zIndex: 9999,
+              pointerEvents: "none",
+            }}
+          >
+            {tooltipData.content}
+          </Box>
+        )}
       </CardContent>
     </Card>
   );
