@@ -29,12 +29,25 @@ export const fetchRevenueStats = async (axios, from, to) => {
   return res.data;
 };
 
+export const fetchRevenueByCategoriesStats = async (axios, from, to) => {
+  const params = {};
+  if (from) params.from = from;
+  if (to) params.to = to;
+
+  const res = await axios.get("api/v1/payments/stats/revenue-by-categories", {
+    params,
+  });
+  return res.data;
+};
+
 export const fetchAppointmentByStatusStats = async (axios, from, to) => {
   const params = {};
   if (from) params.from = from;
   if (to) params.to = to;
 
-  const res = await axios.get("api/v1/appointments/stats/count-by-status", { params });
+  const res = await axios.get("api/v1/appointments/stats/count-by-status", {
+    params,
+  });
   return res.data;
 };
 

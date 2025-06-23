@@ -12,6 +12,7 @@ import paths from "../../../routes/paths";
 import Revenue from "./components/Revenue";
 import AppointmentsOverCarBrands from "./components/AppointmentsOverCarBrands";
 import AppointmentsByStatus from "./components/AppointmentsByStatus";
+import RevenueByCategories from "./components/RevenueByCategories";
 
 const TabPanel = ({ children, value, index }) => {
   return (
@@ -106,7 +107,7 @@ const OtherCharts = () => {
         </TabPanel>
 
         <TabPanel value={tab} index={3}>
-          <Typography>Appointments Over Time Chart Placeholder</Typography>{" "}
+          <RevenueByCategories />
         </TabPanel>
       </Paper>
     </Box>
