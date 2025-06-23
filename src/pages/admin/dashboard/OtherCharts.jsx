@@ -9,7 +9,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
 import paths from "../../../routes/paths";
+import Revenue from "./components/Revenue";
 import AppointmentsOverCarBrands from "./components/AppointmentsOverCarBrands";
+import AppointmentsByStatus from "./components/AppointmentsByStatus";
 
 const TabPanel = ({ children, value, index }) => {
   return (
@@ -83,27 +85,28 @@ const OtherCharts = () => {
             label="Appointments Over Car Brand"
             sx={{ textAlign: "center" }}
           />
+          <Tab label="Appointments Over Time" sx={{ textAlign: "center" }} />
           <Tab label="Revenue" sx={{ textAlign: "center" }} />
           <Tab
             label="Revenue By Service Category"
             sx={{ textAlign: "center" }}
           />
-          <Tab label="Appointments Over Time" sx={{ textAlign: "center" }} />
         </Tabs>
 
         <TabPanel value={tab} index={0}>
-          {/* TODO: Vehicle Types Chart goes here */}
           <AppointmentsOverCarBrands />
         </TabPanel>
 
         <TabPanel value={tab} index={1}>
-          {/* TODO: Vehicle Brands Chart goes here */}
-          <Typography>Vehicle Brands Chart Placeholder</Typography>
+          <AppointmentsByStatus />
         </TabPanel>
 
         <TabPanel value={tab} index={2}>
-          {/* TODO: Appointments Over Time Chart goes here */}
-          <Typography>Appointments Over Time Chart Placeholder</Typography>
+          <Revenue />
+        </TabPanel>
+
+        <TabPanel value={tab} index={3}>
+          <Typography>Appointments Over Time Chart Placeholder</Typography>{" "}
         </TabPanel>
       </Paper>
     </Box>

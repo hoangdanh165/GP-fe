@@ -20,6 +20,24 @@ export const fetchFeedbackStats = async (axios) => {
   // };
 };
 
+export const fetchRevenueStats = async (axios, from, to) => {
+  const params = {};
+  if (from) params.from = from;
+  if (to) params.to = to;
+
+  const res = await axios.get("api/v1/payments/stats/revenue", { params });
+  return res.data;
+};
+
+export const fetchAppointmentByStatusStats = async (axios, from, to) => {
+  const params = {};
+  if (from) params.from = from;
+  if (to) params.to = to;
+
+  const res = await axios.get("api/v1/appointments/stats/count-by-status", { params });
+  return res.data;
+};
+
 export const fetchPopularTimeSlotsStats = async (axiosInstance) => {
   const res = await axiosInstance.get(
     "api/v1/appointments/stats/popular-time-slots"
