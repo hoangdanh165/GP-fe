@@ -27,6 +27,13 @@ export const fetchPopularTimeSlotsStats = async (axiosInstance) => {
   return res.data;
 };
 
+export const fetchPopularCarBrandsStats = async (axiosInstance) => {
+  const res = await axiosInstance.get(
+    "api/v1/appointments/stats/popular-car-brands"
+  );
+  return res.data;
+};
+
 export const fetchCategoryCount = async (axios) => {
   const res = await axios.get(
     "/api/v1/services/stats/category-usage-last-30-days"

@@ -103,7 +103,7 @@ export default function CategoriesBarChart() {
           onMouseLeave={handleMouseLeave}
         >
           <BarChart
-            xAxis={[{ scaleType: "band", data: categories }]}
+            xAxis={[{ scaleType: "band", data: categories, hideTooltip: true }]}
             series={[{ data: values, color }]}
             height={300}
             margin={{ left: 40, right: 20, top: 30, bottom: 40 }}
@@ -120,7 +120,7 @@ export default function CategoriesBarChart() {
               position: "fixed",
               top: tooltipData.y,
               left: tooltipData.x,
-              backgroundColor: "rgba(0,0,0,0.8)",
+              backgroundColor: "black",
               color: "#fff",
               px: 1,
               py: 0.5,

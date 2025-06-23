@@ -55,7 +55,7 @@ export default function PopularTimeSlotsChart() {
             colors={colorPalette}
             xAxis={[chartData.xAxis]}
             series={chartData.series}
-            height={250}
+            height={300}
             margin={{ left: 50, right: 0, top: 20, bottom: 20 }}
             grid={{ horizontal: true }}
             slotProps={{

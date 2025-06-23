@@ -24,6 +24,7 @@ export default {
   invoice_management_admin: `${rootPaths.adminRoot}/invoices-management`,
   admin_profile: `${rootPaths.adminRoot}/profile`,
   dashboard: `${rootPaths.adminRoot}/dashboard`,
+  dashboard_show_more: `${rootPaths.adminRoot}/dashboard/other-charts`,
 
   // Customer paths
   customer_chat: `${rootPaths.customerRoot}/chat`,

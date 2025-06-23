@@ -26,6 +26,7 @@ const Dashboard = lazy(() => import("../pages/admin/dashboard/Dashboard"));
 const AccountsManagement = lazy(() =>
   import("../pages/admin/accounts-management/AccountsManagement")
 );
+const OtherCharts = lazy(() => import("../pages/admin/dashboard/OtherCharts"));
 
 const AppointmentsManagement = lazy(() =>
   import("../pages/admin/appointments-management/AppointmentsManagement")
@@ -185,6 +186,14 @@ const routes = [
             element: (
               <PrivateRoute allowedRoles={["admin"]}>
                 <AdminProfileManagement />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: paths.dashboard_show_more,
+            element: (
+              <PrivateRoute allowedRoles={["admin"]}>
+                <OtherCharts />
               </PrivateRoute>
             ),
           },
