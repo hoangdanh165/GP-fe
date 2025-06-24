@@ -47,6 +47,7 @@ export default function VehiclesTable() {
       await axiosPrivate.patch(
         `/api/v1/cars/${selectedVehicle.id}/`,
         {
+          model: formData.model,
           name: formData.name,
           brand: formData.brand,
           color: formData.color,
@@ -78,6 +79,7 @@ export default function VehiclesTable() {
           `/api/v1/cars/`,
           {
             name: formData.name,
+            model: formData.model,
             brand: formData.brand,
             color: formData.color,
             year: formData.year,

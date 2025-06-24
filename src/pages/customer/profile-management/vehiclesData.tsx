@@ -18,6 +18,7 @@ export const useFetchCars = (reloadTrigger: number) => {
         const formattedData = response.data.map((car: any) => ({
           id: car.id,
           name: car.name,
+          model: car.model,
           year: car.year,
           brand: car.brand,
           color: car.color,
