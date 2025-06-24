@@ -45,19 +45,34 @@ const Dashboard = () => {
       </Typography>
 
       <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
-        {userStat && (
+        {userStat ? (
           <Grid item xs={12} sm={6} lg={3}>
-            <StatCard {...userStat} />
+            <StatCard {...userStat} loading={userStat === null} />
+          </Grid>
+        ) : (
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard loading={true} />
           </Grid>
         )}
-        {appointmentStat && (
+        {appointmentStat ? (
           <Grid item xs={12} sm={6} lg={3}>
-            <StatCard {...appointmentStat} />
+            <StatCard {...appointmentStat} loading={appointmentStat === null} />
+          </Grid>
+        ) : (
+          <Grid item xs={12} sm={6} lg={3}>
+            <StatCard loading={true} />
           </Grid>
         )}
-        {feedbackStat && (
+        {feedbackStat ? (
           <Grid item xs={12} sm={6} lg={3}>
-            <FeedbackStatCard {...feedbackStat} />
+            <FeedbackStatCard
+              {...feedbackStat}
+              loading={feedbackStat === null}
+            />
+          </Grid>
+        ) : (
+          <Grid item xs={12} sm={6} lg={3}>
+            <FeedbackStatCard loading={true} />
           </Grid>
         )}
 

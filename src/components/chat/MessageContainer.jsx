@@ -48,6 +48,7 @@ const MessageContainer = () => {
     socket.on("newMessage", (message) => {
       if (selectedConversation._id === message.conversation) {
         setMessages((prev) => [...prev, message]);
+        console.log("New message received:", message);
       }
 
       if (!document.hasFocus()) {
@@ -60,7 +61,7 @@ const MessageContainer = () => {
           if (conversation.id === message.conversation) {
             return {
               ...conversation,
-              last_message: message.message,
+              last_message: message.image ? "[Image]" : message.message,
               last_sender: message.sender,
             };
           }

@@ -9,6 +9,7 @@ import useAxiosPrivate from "./../../../../hooks/useAxiosPrivate";
 import { fetchCategoryCount } from "../data/statData";
 import Tooltip from "@mui/material/Tooltip";
 import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
 
 export default function CategoriesBarChart() {
   const theme = useTheme();
@@ -27,6 +28,7 @@ export default function CategoriesBarChart() {
     y: 0,
     content: "",
   });
+  const [loading, setLoading] = React.useState(true);
 
   const chartRef = React.useRef<HTMLDivElement>(null);
 
@@ -34,6 +36,7 @@ export default function CategoriesBarChart() {
 
   React.useEffect(() => {
     const load = async () => {
+      setLoading(true);
       const res = await fetchCategoryCount(axios);
       if (res?.data) {
         const labels = res.data.map((item: any) => item.label);
@@ -51,6 +54,7 @@ export default function CategoriesBarChart() {
         setValues(totals);
         setTooltips(tooltipMap);
       }
+      setLoading(false);
     };
 
     load();
@@ -97,24 +101,30 @@ export default function CategoriesBarChart() {
           </Typography>
         </Stack>
 
-        <Box
-          ref={chartRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        >
-          <BarChart
-            xAxis={[{ scaleType: "band", data: categories, hideTooltip: true }]}
-            series={[{ data: values, color }]}
-            height={300}
-            margin={{ left: 40, right: 20, top: 30, bottom: 40 }}
-            sx={{
-              ".MuiChartsTooltip-root": { display: "none" },
-            }}
-            slotProps={{ tooltip: { trigger: "none" } }}
-          />
-        </Box>
+        {loading ? (
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 3, mb: 3 }}>
+            <CircularProgress size={28} sx={{ mb: 1 }} />
+            <Typography variant="body2">Loading chart data...</Typography>
+          </Box>
+        ) : (
+          <Box
+            ref={chartRef}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          >
+            <BarChart
+              xAxis={[{ scaleType: "band", data: categories, hideTooltip: true }]}
+              series={[{ data: values, color }]}
+              height={300}
+              margin={{ left: 40, right: 20, top: 30, bottom: 40 }}
+              sx={{
+                ".MuiChartsTooltip-root": { display: "none" },
+              }}
+            />
+          </Box>
+        )}
 
-        {tooltipData.open && (
+        {tooltipData.open && !loading && (
           <Box
             sx={{
               position: "fixed",

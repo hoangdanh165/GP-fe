@@ -9,6 +9,8 @@ import { BarChart } from "@mui/x-charts/BarChart";
 import { useTheme } from "@mui/material/styles";
 import { fetchPopularTimeSlotsStats } from "../data/statData";
 import useAxiosPrivate from "../../../../hooks/useAxiosPrivate";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 
 export default function PopularTimeSlotsChart() {
   const theme = useTheme();
@@ -17,9 +19,9 @@ export default function PopularTimeSlotsChart() {
   const axios = useAxiosPrivate();
 
   const colorPalette = [
-    (theme.vars || theme).palette.primary.dark,
-    (theme.vars || theme).palette.primary.main,
-    (theme.vars || theme).palette.primary.light,
+    theme.palette.primary.dark,
+    theme.palette.primary.main,
+    theme.palette.primary.light,
   ];
 
   useEffect(() => {
@@ -49,7 +51,20 @@ export default function PopularTimeSlotsChart() {
           </Typography>
         </Stack>
 
-        {!loading && chartData ? (
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              mt: 3,
+              mb: 3,
+            }}
+          >
+            <CircularProgress size={28} sx={{ mb: 1 }} />
+            <Typography variant="body2">Loading chart data...</Typography>
+          </Box>
+        ) : chartData ? (
           <BarChart
             borderRadius={8}
             colors={colorPalette}
@@ -65,7 +80,7 @@ export default function PopularTimeSlotsChart() {
             }}
           />
         ) : (
-          <Typography sx={{ mt: 2 }}>Loading data...</Typography>
+          <Typography sx={{ mt: 2 }}>No data available</Typography>
         )}
       </CardContent>
     </Card>

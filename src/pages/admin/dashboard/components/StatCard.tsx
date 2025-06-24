@@ -11,6 +11,7 @@ import { areaElementClasses } from "@mui/x-charts/LineChart";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import CircularProgress from "@mui/material/CircularProgress";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -18,11 +19,12 @@ dayjs.extend(timezone);
 const TIMEZONE = "Asia/Ho_Chi_Minh";
 
 export type StatCardProps = {
-  title: string;
-  value: string;
-  interval: string;
-  trend: "up" | "down" | "neutral";
-  data: number[];
+  title?: string;
+  value?: string;
+  interval?: string;
+  trend?: "up" | "down" | "neutral";
+  data?: number[];
+  loading?: boolean;
 };
 
 function getLast30Days() {
@@ -49,11 +51,12 @@ function AreaGradient({ color, id }: { color: string; id: string }) {
 }
 
 export default function StatCard({
-  title,
-  value,
-  interval,
-  trend,
-  data,
+  title = "",
+  value = "",
+  interval = "",
+  trend = "neutral",
+  data = [],
+  loading = false,
 }: StatCardProps) {
   const theme = useTheme();
   const daysInWeek = getLast30Days();
@@ -82,6 +85,26 @@ export default function StatCard({
   const color = labelColors[trend];
   const chartColor = trendColors[trend];
   const trendValues = { up: "+25%", down: "-25%", neutral: "+5%" };
+
+  if (loading) {
+    return (
+      <Card
+        variant="outlined"
+        sx={{
+          height: "100%",
+          flexGrow: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <CircularProgress size={28} sx={{ mb: 1 }} />
+          <Typography variant="body2">Loading chart data...</Typography>
+        </Box>
+      </Card>
+    );
+  }
 
   return (
     <Card variant="outlined" sx={{ height: "100%", flexGrow: 1 }}>
