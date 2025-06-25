@@ -143,17 +143,17 @@ export default function AppointmentStats() {
               {
                 scaleType: "point",
                 data: xData,
-                tickInterval: (val, i) => (i + 1) % 3 === 0,
+                // tickInterval: (val, i) => (i + 1) % 3 === 0,
               },
             ]}
-            series={[...statusSeries, totalSeries]}
+            series={[...statusSeries]}
             height={300}
             margin={{ top: 30, bottom: 40, left: 60, right: 20 }}
             grid={{ horizontal: true }}
             slotProps={{
               legend: {
                 direction: "row",
-                position: { vertical: "left", horizontal: "middle" },
+                position: { vertical: "top", horizontal: "top" },
                 padding: 10,
                 itemMarkWidth: 20,
                 itemMarkHeight: 20,

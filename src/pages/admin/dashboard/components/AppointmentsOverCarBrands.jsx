@@ -95,7 +95,7 @@ export default function AppointmentsOverCarBrands() {
             margin={{ top: 30, bottom: 40, left: 50, right: 20 }}
             grid={{ horizontal: true }}
             slotProps={{
-              legend: { hidden: false },
+              legend: { hidden: true },
             }}
           />
         )}

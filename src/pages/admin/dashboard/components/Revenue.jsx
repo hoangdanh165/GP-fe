@@ -111,7 +111,7 @@ export default function Revenue() {
               {
                 scaleType: "point",
                 data: xData,
-                tickInterval: (val, i) => (i + 1) % 3 === 0,
+                // tickInterval: (val, i) => (i + 1) % 3 === 0,
               },
             ]}
             series={[
@@ -121,7 +121,7 @@ export default function Revenue() {
                 color: color,
                 showMark: false,
                 curve: "monotone",
-                area: true,
+                area: false,
               },
             ]}
             height={300}
