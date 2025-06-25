@@ -250,6 +250,14 @@ const VehicleDialog = ({
         />
         <TextField
           fullWidth
+          label="VIN (Vehicle Identification Number)"
+          name="vin"
+          value={formData.vin || ""}
+          onChange={handleChange}
+          margin="normal"
+        />
+        <TextField
+          fullWidth
           label="Current Odometer"
           name="currentOdometer"
           type="number"
